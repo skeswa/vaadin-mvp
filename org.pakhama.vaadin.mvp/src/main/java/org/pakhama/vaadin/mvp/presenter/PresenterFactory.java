@@ -2,36 +2,34 @@ package org.pakhama.vaadin.mvp.presenter;
 
 import java.lang.reflect.ParameterizedType;
 
-import org.pakhama.vaadin.mvp.event.EventBus;
+import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.InaccessiblePresenterException;
-import org.pakhama.vaadin.mvp.exception.InaccessibleViewException;
 import org.pakhama.vaadin.mvp.exception.PresenterConstructionException;
-import org.pakhama.vaadin.mvp.exception.ViewConstructionException;
-import org.pakhama.vaadin.mvp.view.View;
+import org.pakhama.vaadin.mvp.view.IView;
+import org.pakhama.vaadin.mvp.view.ViewFactory;
 
 public class PresenterFactory {
-	private EventBus eventBus;
-	private Presenter<? extends View> parent;
+	private IEventBus eventBus;
+	private ViewFactory viewFactory;
 	
-	public PresenterFactory(Presenter<? extends View> presenter) {
-		if (eventBus == null) {
-			throw new IllegalArgumentException("The presenter parameter cannot be null when creating a " + getClass().getSimpleName() + ".");
-		}
-		
-		this.parent = presenter;
-		this.eventBus = presenter.getEventBus();
-	}
-	
-	public PresenterFactory(EventBus eventBus) {
+	public PresenterFactory(IEventBus eventBus) {
 		if (eventBus == null) {
 			throw new IllegalArgumentException("The eventBus parameter cannot be null when creating a " + getClass().getSimpleName() + ".");
 		}
 		
 		this.eventBus = eventBus;
+		this.viewFactory = new ViewFactory();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Presenter<? extends View>> T create(Class<T> presenterClass) {
+	<T extends Presenter<? extends IView>> T create(Class<T> presenterClass, Presenter<? extends IView> parent) {
+		Presenter<? extends IView> childPresenter = create(presenterClass);
+		childPresenter.setParent(parent);
+		return (T) childPresenter;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Presenter<? extends IView>> T create(Class<T> presenterClass) {
 		if (presenterClass == null) {
 			throw new IllegalArgumentException("The presenterClass parameter cannot be null.");
 		}
@@ -40,11 +38,11 @@ public class PresenterFactory {
 		}
 		
 		Class<?> viewClass = PresenterFactory.getTypeOfGeneric(presenterClass);
-		if (!View.class.isAssignableFrom(viewClass)) {
-			throw new IllegalArgumentException("The viewClass, specified in the generic of the presenterClass parameter, must implement " + View.class.getName() + ".");
+		if (!IView.class.isAssignableFrom(viewClass)) {
+			throw new IllegalArgumentException("The viewClass, specified in the generic of the presenterClass parameter, must implement " + IView.class.getName() + ".");
 		}
 		
-		Presenter<? extends View> presenterInstance = null;
+		Presenter<? extends IView> presenterInstance = null;
 		try {
 			presenterInstance = presenterClass.newInstance();
 		} catch (InstantiationException e) {
@@ -52,8 +50,9 @@ public class PresenterFactory {
 		} catch (IllegalAccessException e) {
 			throw new InaccessiblePresenterException();
 		}
+		presenterInstance.setPresenterFactory(this);
 		
-		Class<?> viewInstanceClass = presenterInstance.view();
+		Class<? extends IView> viewInstanceClass = presenterInstance.view();
 		if (viewInstanceClass == null) {
 			throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName() + ") returned null. It must return the class of the implementation of the presenter's view (" + viewClass + ").");
 		}
@@ -61,21 +60,10 @@ public class PresenterFactory {
 			throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName() + ") returned a type that didn't implement this presenter's view (" + viewClass + ").");
 		}
 		
-		View viewInstance = null;
-		try {
-			viewInstance = (View) viewInstanceClass.newInstance();
-		} catch (InstantiationException e) {
-			throw new ViewConstructionException("Views must have a default constructor and cannot be abstract.", e);
-		} catch (IllegalAccessException e) {
-			throw new InaccessibleViewException();
-		} catch (ClassCastException e) {
-			throw new ViewConstructionException("The provided view of type " + viewInstanceClass.getName() + " could not be cast to " + View.class.getName() + ".", e);
-		}
+		IView viewInstance = this.viewFactory.create(presenterInstance, viewInstanceClass);
 		
 		presenterInstance.setEventBus(this.eventBus);
-		presenterInstance.setParent(this.parent);
 		presenterInstance.setView(viewInstance);
-		viewInstance.bind(this.eventBus);
 		
 		this.eventBus.register(presenterInstance);
 		

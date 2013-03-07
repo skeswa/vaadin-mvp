@@ -6,10 +6,10 @@ import org.pakhama.vaadin.mvp.event.GreenColorChangeEvent;
 import org.pakhama.vaadin.mvp.event.Listener;
 import org.pakhama.vaadin.mvp.event.RedColorChangeEvent;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
+import org.pakhama.vaadin.mvp.view.IColorSamplerView;
 import org.pakhama.vaadin.mvp.view.ColorSamplerView;
-import org.pakhama.vaadin.mvp.view.ColorSamplerViewImpl;
 
-public class ColorSamplePresenter extends Presenter<ColorSamplerView> {
+public class ColorSamplePresenter extends Presenter<IColorSamplerView> {
 	private static final long serialVersionUID = 6228261391518269110L;
 	
 	private ColorSampleTestManager testManager;
@@ -19,8 +19,8 @@ public class ColorSamplePresenter extends Presenter<ColorSamplerView> {
 	}
 
 	@Override
-	public Class<? extends ColorSamplerView> view() {
-		return ColorSamplerViewImpl.class;
+	public Class<? extends IColorSamplerView> view() {
+		return ColorSamplerView.class;
 	}
 
 	@Listener(event = ColorChangeEvent.class)

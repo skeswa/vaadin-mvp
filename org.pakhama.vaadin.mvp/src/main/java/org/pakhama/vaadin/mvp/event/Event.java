@@ -6,7 +6,7 @@ import org.pakhama.vaadin.mvp.presenter.Presenter;
 
 /**
  * This is the super type for all events. Events are fired with the
- * {@link EventBus} <code>fire()</code> method. Events can be listened to by
+ * {@link IEventBus} <code>fire()</code> method. Events can be listened to by
  * with {@link Presenter} methods labeled with the {@link Listener} annotation.
  * 
  * @author Sandile

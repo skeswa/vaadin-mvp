@@ -2,16 +2,17 @@ package org.pakhama.vaadin.mvp.presenter;
 
 import java.io.Serializable;
 
-import org.pakhama.vaadin.mvp.event.EventBus;
+import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.IncompatibleViewException;
-import org.pakhama.vaadin.mvp.view.View;
+import org.pakhama.vaadin.mvp.view.IView;
 
-public abstract class Presenter<T extends View> implements Serializable {
+public abstract class Presenter<T extends IView> implements Serializable {
 	private static final long serialVersionUID = 5131211825391491296L;
 
-	private Presenter<? extends View> parent;
+	private Presenter<? extends IView> parent;
 	private T view;
-	private EventBus eventBus;
+	private IEventBus eventBus;
+	private PresenterFactory factory;
 
 	/**
 	 * Gets this presenters view. The type of this view is specified by the type
@@ -24,11 +25,17 @@ public abstract class Presenter<T extends View> implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	void setView(View view) {
+	void setView(IView view) {
 		try {
 			this.view = (T) view;
 		} catch (ClassCastException e) {
 			throw new IncompatibleViewException(view, this);
+		}
+	}
+	
+	void setPresenterFactory(PresenterFactory factory) {
+		if (this.factory == null) {
+			this.factory = factory;
 		}
 	}
 
@@ -37,11 +44,11 @@ public abstract class Presenter<T extends View> implements Serializable {
 	 * 
 	 * @return this presenter's event bus
 	 */
-	public EventBus getEventBus() {
+	public IEventBus getEventBus() {
 		return eventBus;
 	}
 
-	void setEventBus(EventBus eventBus) {
+	void setEventBus(IEventBus eventBus) {
 		this.eventBus = eventBus;
 	}
 
@@ -53,11 +60,11 @@ public abstract class Presenter<T extends View> implements Serializable {
 	 * 
 	 * @return the parent presenter or null if no such parent presenter exists
 	 */
-	public Presenter<? extends View> getParent() {
+	public Presenter<? extends IView> getParent() {
 		return this.parent;
 	}
 
-	void setParent(Presenter<? extends View> parent) {
+	void setParent(Presenter<? extends IView> parent) {
 		this.parent = parent;
 	}
 
@@ -81,31 +88,15 @@ public abstract class Presenter<T extends View> implements Serializable {
 	 * 		the class of the view implementation for this presenter
 	 */
 	public abstract Class<? extends T> view();
+	
+	protected Presenter<? extends IView> createChild(Class<? extends Presenter<? extends IView>> childPresenterClass) {
+		return this.factory.create(childPresenterClass, this);
+	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
-//		builder.append(": { Parent: ");
-//		if (parent != null) {
-//			builder.append(parent);
-//		} else {
-//			builder.append("null");
-//		}
-//		builder.append(", View: ");
-//		if (view != null) {
-//			builder.append(view.getClass().getSimpleName());
-//		} else {
-//			builder.append("null");
-//		}
-//		builder.append(", Event Bus: ");
-//		if (eventBus != null) {
-//			builder.append(eventBus.getClass().getSimpleName());
-//		} else {
-//			builder.append("null");
-//		}
-//		builder.append(" }");
-
-		return builder.toString();
+		return getClass().getSimpleName();
 	}
 }

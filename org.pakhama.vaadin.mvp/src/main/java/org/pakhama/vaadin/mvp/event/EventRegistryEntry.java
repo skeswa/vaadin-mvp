@@ -63,25 +63,26 @@ class EventRegistryEntry {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
-		builder.append(": { Instance: ");
+		builder.append("( Instance: ");
 		if (handlerInstance != null && handlerInstance != null) {
 			builder.append(handlerInstance);
 		} else {
 			builder.append("null");
 		}
-		builder.append(", Listener Method: ");
+		builder.append(", Listener: ");
 		if (listenerMethod != null) {
 			builder.append(listenerMethod.getName());
+			builder.append("()");
 		} else {
 			builder.append("null");
 		}
 		builder.append(", Event: ");
 		if (eventType != null) {
-			builder.append(eventType);
+			builder.append(eventType.getSimpleName());
 		} else {
 			builder.append("null");
 		}
-		builder.append(" }");
+		builder.append(" )");
 		
 		return builder.toString();
 	}

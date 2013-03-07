@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 import org.pakhama.vaadin.mvp.exception.EventListenerFaultException;
 import org.pakhama.vaadin.mvp.exception.EventRegistrationException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
-import org.pakhama.vaadin.mvp.view.View;
+import org.pakhama.vaadin.mvp.view.IView;
 
-class EventBusImpl implements EventBus {
+class EventBusImpl implements IEventBus {
 	private EventRegistry eventRegistry;
 	private ViewRegistry viewRegistry;
 
@@ -28,7 +28,7 @@ class EventBusImpl implements EventBus {
 	}
 
 	@Override
-	public void register(Presenter<? extends View> presenter) {
+	public void register(Presenter<? extends IView> presenter) {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter cannot be null.");
 		}
@@ -60,7 +60,7 @@ class EventBusImpl implements EventBus {
 	}
 
 	@Override
-	public void unregister(Presenter<? extends View> presenter) {
+	public void unregister(Presenter<? extends IView> presenter) {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter must not be null.");
 		}
@@ -87,8 +87,8 @@ class EventBusImpl implements EventBus {
 					}
 					break;
 				}
-			} else if (e.getSource() instanceof View) {
-				Presenter<?> parent = getPresenter((View) e.getSource());
+			} else if (e.getSource() instanceof IView) {
+				Presenter<?> parent = getPresenter((IView) e.getSource());
 				if (parent != null) {
 					try {
 						provideEventRegistry().invoke(e, parent);
@@ -110,7 +110,7 @@ class EventBusImpl implements EventBus {
 	}
 
 	@Override
-	public Presenter<? extends View> getPresenter(View view) {
+	public Presenter<? extends IView> getPresenter(IView view) {
 		return provideViewRegistry().getPresenter(view);
 	}
 

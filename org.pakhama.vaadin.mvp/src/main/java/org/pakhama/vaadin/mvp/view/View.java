@@ -1,26 +1,38 @@
 package org.pakhama.vaadin.mvp.view;
 
-import org.pakhama.vaadin.mvp.event.EventBus;
+import org.pakhama.vaadin.mvp.event.IEventBus;
+import org.pakhama.vaadin.mvp.presenter.Presenter;
 
-import com.vaadin.ui.Component;
+import com.vaadin.ui.VerticalLayout;
 
-public interface View extends Component {
-	/**
-	 * Binds this view to the same event bus that its presenter was registered
-	 * under. The previously mentioned event bus is passed as a parameter
-	 * through this method. This method is guaranteed to be called before this
-	 * view's <code>init()</code> method.
-	 * 
-	 * @param eventBus
-	 *            the event bus under which this view's presenter is registered
-	 */
-	void bind(EventBus eventBus);
+public abstract class View extends VerticalLayout implements IView {
+	private static final long serialVersionUID = 5552315123806395809L;
 
-	/**
-	 * Initializes the user interface artifacts so that they are ready to
-	 * display data. This method should be used in place of the default
-	 * constructor for initialization of the view. Furthermore, this method will
-	 * always be invoked before its presenter's <code>init()</code> method.
-	 */
-	void init();
+	private IEventBus eventBus;
+	private Presenter<? extends IView> presenter;
+	
+	void setPresenter(Presenter<? extends IView> presenter) {
+		if (this.presenter == null) {
+			this.presenter = presenter;
+		}
+	}
+	
+	protected Presenter<? extends IView> getPresenter() {
+		return presenter;
+	}
+
+	void setEventBus(IEventBus eventBus) {
+		if (this.eventBus == null) {
+			this.eventBus = eventBus;
+		}
+	}
+
+	protected IEventBus getEventBus() {
+		return eventBus;
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }
