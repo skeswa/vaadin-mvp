@@ -15,7 +15,7 @@ public class PresenterFactory {
 	
 	public PresenterFactory(Presenter<? extends View> presenter) {
 		if (eventBus == null) {
-			throw new IllegalArgumentException("The presenter parameter cannot be null when creating a " + getClass().getName() + ".");
+			throw new IllegalArgumentException("The presenter parameter cannot be null when creating a " + getClass().getSimpleName() + ".");
 		}
 		
 		this.parent = presenter;
@@ -24,7 +24,7 @@ public class PresenterFactory {
 	
 	public PresenterFactory(EventBus eventBus) {
 		if (eventBus == null) {
-			throw new IllegalArgumentException("The eventBus parameter cannot be null when creating a " + getClass().getName() + ".");
+			throw new IllegalArgumentException("The eventBus parameter cannot be null when creating a " + getClass().getSimpleName() + ".");
 		}
 		
 		this.eventBus = eventBus;

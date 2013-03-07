@@ -28,7 +28,7 @@ public abstract class AbstractView extends VerticalLayout implements View {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getName());
+		builder.append(getClass().getSimpleName());
 		builder.append(": { Event Bus: ");
 		if (eventBus != null) {
 			builder.append(eventBus);

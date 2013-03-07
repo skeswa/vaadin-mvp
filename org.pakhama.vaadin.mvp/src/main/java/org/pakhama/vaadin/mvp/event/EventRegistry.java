@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
 
@@ -16,7 +15,7 @@ class EventRegistry {
 	private Map<Class<? extends Event>, Map<Object, Collection<EventRegistryEntry>>> entries;
 
 	public EventRegistry() {
-		this.entries = new ConcurrentHashMap<Class<? extends Event>, Map<Object, Collection<EventRegistryEntry>>>();
+		this.entries = new HashMap<Class<? extends Event>, Map<Object, Collection<EventRegistryEntry>>>();
 	}
 
 	void register(Object handlerInstance, Method listenerMethod, Class<? extends Event> eventType) {
@@ -30,7 +29,7 @@ class EventRegistry {
 			throw new IllegalArgumentException("The event parameter cannot be null.");
 		}
 
-		Map<Object, Collection<EventRegistryEntry>> entryMap = entries.get(eventType.getClass());
+		Map<Object, Collection<EventRegistryEntry>> entryMap = entries.get(eventType);
 		if (entryMap == null) {
 			entryMap = new HashMap<Object, Collection<EventRegistryEntry>>();
 			HashSet<EventRegistryEntry> entrySet = new HashSet<EventRegistryEntry>();
@@ -38,7 +37,7 @@ class EventRegistry {
 			entryMap.put(handlerInstance, entrySet);
 			entries.put(eventType, entryMap);
 		} else {
-			Collection<EventRegistryEntry> entryCollection = entryMap.get(handlerInstance.getClass());
+			Collection<EventRegistryEntry> entryCollection = entryMap.get(handlerInstance);
 			if (entryCollection == null) {
 				entryCollection = new HashSet<EventRegistryEntry>();
 				entryCollection.add(new EventRegistryEntry(handlerInstance, listenerMethod, eventType));
@@ -165,7 +164,8 @@ class EventRegistry {
 		ArrayList<Map<Object, Collection<EventRegistryEntry>>> list = new ArrayList<Map<Object, Collection<EventRegistryEntry>>>();
 		for (Class<? extends Event> key : this.entries.keySet()) {
 			if (key.isAssignableFrom(eventType)) {
-				list.add(this.entries.get(key));
+				Map<Object, Collection<EventRegistryEntry>> value = this.entries.get(key);
+				list.add(value);
 			}
 		}
 		return list;

@@ -1,7 +1,7 @@
 package org.pakhama.vaadin.mvp.event;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.View;
@@ -10,7 +10,7 @@ class ViewRegistry {
 	private Map<View, Presenter<? extends View>> views;
 	
 	public ViewRegistry() {
-		this.views = new ConcurrentHashMap<View, Presenter<? extends View>>();
+		this.views = new HashMap<View, Presenter<? extends View>>();
 	}
 	
 	void register(Presenter<? extends View> presenter) {

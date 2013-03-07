@@ -1,17 +1,16 @@
 package org.pakhama.vaadin.mvp.event;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 class EventRegistryEntry {
 	private static final int HASH_CODE_CONSTANT = 17;
 	
-	private WeakReference<Object> handlerInstance;
+	private Object handlerInstance;
 	private Method listenerMethod;
 	private Class<? extends Event> eventType;
 	
 	public EventRegistryEntry(Object handlerInstance, Method listenerMethod, Class<? extends Event> event) {
-		this.handlerInstance = new WeakReference<Object>(handlerInstance);
+		this.handlerInstance = handlerInstance;
 		this.listenerMethod = listenerMethod;
 		this.eventType = event;
 	}
@@ -21,7 +20,7 @@ class EventRegistryEntry {
 	}
 
 	Object getHandlerInstance() {
-		return handlerInstance.get();
+		return handlerInstance;
 	}
 	
 	Class<? extends Event> getEventType() {
@@ -48,8 +47,8 @@ class EventRegistryEntry {
 	@Override
 	public int hashCode() {
 		int result = HASH_CODE_CONSTANT;
-		if (handlerInstance != null && handlerInstance.get() != null) {
-			result += 31 * result + handlerInstance.get().hashCode();
+		if (handlerInstance != null && handlerInstance != null) {
+			result += 31 * result + handlerInstance.hashCode();
 		}
 		if (listenerMethod != null) {
 			result += 31 * result + listenerMethod.hashCode();
@@ -63,16 +62,16 @@ class EventRegistryEntry {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getName());
+		builder.append(getClass().getSimpleName());
 		builder.append(": { Instance: ");
-		if (handlerInstance != null && handlerInstance.get() != null) {
-			builder.append(handlerInstance.get());
+		if (handlerInstance != null && handlerInstance != null) {
+			builder.append(handlerInstance);
 		} else {
 			builder.append("null");
 		}
 		builder.append(", Listener Method: ");
 		if (listenerMethod != null) {
-			builder.append(listenerMethod);
+			builder.append(listenerMethod.getName());
 		} else {
 			builder.append("null");
 		}

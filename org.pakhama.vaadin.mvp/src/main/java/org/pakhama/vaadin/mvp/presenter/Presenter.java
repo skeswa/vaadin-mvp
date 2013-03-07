@@ -85,26 +85,26 @@ public abstract class Presenter<T extends View> implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getName());
-		builder.append(": { Parent: ");
-		if (parent != null) {
-			builder.append(parent);
-		} else {
-			builder.append("null");
-		}
-		builder.append(", View: ");
-		if (view != null) {
-			builder.append(view);
-		} else {
-			builder.append("null");
-		}
-		builder.append(", Event Bus: ");
-		if (eventBus != null) {
-			builder.append(eventBus);
-		} else {
-			builder.append("null");
-		}
-		builder.append(" }");
+		builder.append(getClass().getSimpleName());
+//		builder.append(": { Parent: ");
+//		if (parent != null) {
+//			builder.append(parent);
+//		} else {
+//			builder.append("null");
+//		}
+//		builder.append(", View: ");
+//		if (view != null) {
+//			builder.append(view.getClass().getSimpleName());
+//		} else {
+//			builder.append("null");
+//		}
+//		builder.append(", Event Bus: ");
+//		if (eventBus != null) {
+//			builder.append(eventBus.getClass().getSimpleName());
+//		} else {
+//			builder.append("null");
+//		}
+//		builder.append(" }");
 
 		return builder.toString();
 	}
