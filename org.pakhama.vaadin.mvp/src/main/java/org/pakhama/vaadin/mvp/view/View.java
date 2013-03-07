@@ -16,23 +16,41 @@ public abstract class View extends VerticalLayout implements IView {
 			this.presenter = presenter;
 		}
 	}
-	
-	protected Presenter<? extends IView> getPresenter() {
-		return presenter;
-	}
 
 	void setEventBus(IEventBus eventBus) {
 		if (this.eventBus == null) {
 			this.eventBus = eventBus;
 		}
 	}
-
-	protected IEventBus getEventBus() {
-		return eventBus;
+	
+	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
+		this.eventBus.fire(e);
+	}
+	
+	@Override
+	public Object getOwner() {
+		return presenter;
 	}
 	
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		StringBuilder builder = new StringBuilder();
+		builder.append(getClass().getSimpleName());
+		builder.append(':');
+		builder.append('{');
+		if (presenter == null) {
+			builder.append("<null presenter>, ");
+		} else {
+			builder.append(presenter.getClass().getName());
+			builder.append(", ");
+		}
+		if (eventBus == null) {
+			builder.append("<null event bus>");
+		} else {
+			builder.append(eventBus.getClass().getName());
+		}
+		builder.append('}');
+		
+		return builder.toString();
 	}
 }

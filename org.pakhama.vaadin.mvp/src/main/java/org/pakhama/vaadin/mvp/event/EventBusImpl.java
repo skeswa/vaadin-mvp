@@ -2,14 +2,15 @@ package org.pakhama.vaadin.mvp.event;
 
 import java.lang.reflect.Method;
 
+import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.exception.EventListenerFaultException;
+import org.pakhama.vaadin.mvp.exception.EventPropagationException;
 import org.pakhama.vaadin.mvp.exception.EventRegistrationException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IView;
 
 class EventBusImpl implements IEventBus {
 	private EventRegistry eventRegistry;
-	private ViewRegistry viewRegistry;
 
 	private EventRegistry provideEventRegistry() {
 		if (this.eventRegistry == null) {
@@ -17,14 +18,6 @@ class EventBusImpl implements IEventBus {
 		}
 
 		return this.eventRegistry;
-	}
-	
-	private ViewRegistry provideViewRegistry() {
-		if (this.viewRegistry == null) {
-			this.viewRegistry = new ViewRegistry();
-		}
-
-		return this.viewRegistry;
 	}
 
 	@Override
@@ -53,7 +46,6 @@ class EventBusImpl implements IEventBus {
 					}
 
 					provideEventRegistry().register(presenter, method, listener.event());
-					provideViewRegistry().register(presenter);
 				}
 			}
 		}
@@ -66,7 +58,6 @@ class EventBusImpl implements IEventBus {
 		}
 
 		provideEventRegistry().unregister(presenter);
-		provideViewRegistry().unregister(presenter);
 	}
 
 	@Override
@@ -78,7 +69,7 @@ class EventBusImpl implements IEventBus {
 		switch (e.getScope()) {
 		case PARENT:
 			if (e.getSource() instanceof Presenter<?>) {
-				Presenter<?> parent = ((Presenter<?>)e.getSource()).getParent();
+				Presenter<?> parent = ((Presenter<?>) e.getSource()).getParent();
 				if (parent != null) {
 					try {
 						provideEventRegistry().invoke(e, parent);
@@ -86,9 +77,12 @@ class EventBusImpl implements IEventBus {
 						throw new EventListenerFaultException(t, e);
 					}
 					break;
+				} else {
+					throw new EventPropagationException("The source of this event (" + e.getSource()
+							+ ") had no parent. The source of the event needs a source to propagate to its parent.");
 				}
 			} else if (e.getSource() instanceof IView) {
-				Presenter<?> parent = getPresenter((IView) e.getSource());
+				Object parent = ((IView) e.getSource()).getOwner();
 				if (parent != null) {
 					try {
 						provideEventRegistry().invoke(e, parent);
@@ -96,6 +90,9 @@ class EventBusImpl implements IEventBus {
 						throw new EventListenerFaultException(t, e);
 					}
 					break;
+				} else {
+					throw new EventPropagationException("The source of this event (" + e.getSource()
+							+ ") had no parent. The source of the event needs a source to propagate to its parent.");
 				}
 			}
 		case ALL:
@@ -107,11 +104,6 @@ class EventBusImpl implements IEventBus {
 			}
 			break;
 		}
-	}
-
-	@Override
-	public Presenter<? extends IView> getPresenter(IView view) {
-		return provideViewRegistry().getPresenter(view);
 	}
 
 }

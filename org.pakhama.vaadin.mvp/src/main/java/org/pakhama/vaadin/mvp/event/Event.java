@@ -81,20 +81,21 @@ public abstract class Event implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
-		builder.append(": { Source: ");
-		if (source != null) {
-			builder.append(source);
+		builder.append(':');
+		builder.append('{');
+		if (source == null) {
+			builder.append("<null source>, ");
 		} else {
-			builder.append("null");
+			builder.append(source.getClass().getName());
+			builder.append(", ");
 		}
-		builder.append(", Scope: ");
-		if (scope != null) {
-			builder.append(scope);
+		if (scope == null) {
+			builder.append("<null scope>");
 		} else {
-			builder.append("null");
+			builder.append(scope.getClass().getName());
 		}
-		builder.append(" }");
-
+		builder.append('}');
+		
 		return builder.toString();
 	}
 }

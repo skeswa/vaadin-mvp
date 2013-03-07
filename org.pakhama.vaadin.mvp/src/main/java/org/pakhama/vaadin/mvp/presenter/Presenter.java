@@ -32,20 +32,15 @@ public abstract class Presenter<T extends IView> implements Serializable {
 			throw new IncompatibleViewException(view, this);
 		}
 	}
-	
+
 	void setPresenterFactory(PresenterFactory factory) {
 		if (this.factory == null) {
 			this.factory = factory;
 		}
 	}
 
-	/**
-	 * Gets the event bus this presenter has been registered under.
-	 * 
-	 * @return this presenter's event bus
-	 */
-	public IEventBus getEventBus() {
-		return eventBus;
+	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
+		this.eventBus.fire(e);
 	}
 
 	void setEventBus(IEventBus eventBus) {
@@ -84,11 +79,18 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	 * implementation must implement the view interface of this presenter (as
 	 * specified in the generic of this class).
 	 * 
-	 * @return
-	 * 		the class of the view implementation for this presenter
+	 * @return the class of the view implementation for this presenter
 	 */
 	public abstract Class<? extends T> view();
-	
+
+	/**
+	 * Create a new presenter that will refer to this presenter as its parent.
+	 * This means that the new child presenter will have the option to propagate
+	 * events only to this presenter.
+	 * 
+	 * @param childPresenterClass the class of the child presenter
+	 * @return a new instance of the child presenter class
+	 */
 	protected Presenter<? extends IView> createChild(Class<? extends Presenter<? extends IView>> childPresenterClass) {
 		return this.factory.create(childPresenterClass, this);
 	}
@@ -97,6 +99,27 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
-		return getClass().getSimpleName();
+		builder.append(':');
+		builder.append('{');
+		if (view == null) {
+			builder.append("<null view>, ");
+		} else {
+			builder.append(view.getClass().getName());
+			builder.append(", ");
+		}
+		if (eventBus == null) {
+			builder.append("<null event bus>, ");
+		} else {
+			builder.append(eventBus.getClass().getName());
+			builder.append(", ");
+		}
+		if (parent == null) {
+			builder.append("<null parent>");
+		} else {
+			builder.append(parent.getClass().getName());
+		}
+		builder.append('}');
+		
+		return builder.toString();
 	}
 }

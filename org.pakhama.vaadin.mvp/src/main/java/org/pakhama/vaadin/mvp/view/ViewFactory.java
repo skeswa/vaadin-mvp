@@ -1,12 +1,16 @@
 package org.pakhama.vaadin.mvp.view;
 
+import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.InaccessibleViewException;
 import org.pakhama.vaadin.mvp.exception.ViewConstructionException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 
 public class ViewFactory {
 	
-	public IView create(Presenter<? extends IView> presenter, Class<? extends IView> viewType) {
+	public IView create(IEventBus eventBus, Presenter<? extends IView> presenter, Class<? extends IView> viewType) {
+		if (eventBus == null) {
+			throw new IllegalArgumentException("The eventBus paramter must not be null.");
+		}
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter paramter must not be null.");
 		}
@@ -26,7 +30,7 @@ public class ViewFactory {
 		}
 		
 		if (viewInstance instanceof View) {
-			((View) viewInstance).setEventBus(presenter.getEventBus());
+			((View) viewInstance).setEventBus(eventBus);
 			((View) viewInstance).setPresenter(presenter);
 		}
 		

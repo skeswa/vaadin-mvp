@@ -3,11 +3,11 @@ package org.pakhama.vaadin.mvp;
 import org.pakhama.vaadin.mvp.event.BlueColorChangeEvent;
 import org.pakhama.vaadin.mvp.event.ColorChangeEvent;
 import org.pakhama.vaadin.mvp.event.GreenColorChangeEvent;
-import org.pakhama.vaadin.mvp.event.Listener;
 import org.pakhama.vaadin.mvp.event.RedColorChangeEvent;
+import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
-import org.pakhama.vaadin.mvp.view.IColorSamplerView;
 import org.pakhama.vaadin.mvp.view.ColorSamplerView;
+import org.pakhama.vaadin.mvp.view.IColorSamplerView;
 
 public class ColorSamplePresenter extends Presenter<IColorSamplerView> {
 	private static final long serialVersionUID = 6228261391518269110L;

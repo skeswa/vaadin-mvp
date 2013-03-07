@@ -1,8 +1,8 @@
 package org.pakhama.vaadin.mvp;
 
 import org.pakhama.vaadin.mvp.event.ColorChangeEvent;
-import org.pakhama.vaadin.mvp.event.Listener;
 import org.pakhama.vaadin.mvp.event.RedColorChangeEvent;
+import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IOtherView;
 import org.pakhama.vaadin.mvp.view.OtherView;

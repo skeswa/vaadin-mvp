@@ -50,7 +50,6 @@ public class PresenterFactory {
 		} catch (IllegalAccessException e) {
 			throw new InaccessiblePresenterException();
 		}
-		presenterInstance.setPresenterFactory(this);
 		
 		Class<? extends IView> viewInstanceClass = presenterInstance.view();
 		if (viewInstanceClass == null) {
@@ -60,8 +59,9 @@ public class PresenterFactory {
 			throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName() + ") returned a type that didn't implement this presenter's view (" + viewClass + ").");
 		}
 		
-		IView viewInstance = this.viewFactory.create(presenterInstance, viewInstanceClass);
+		IView viewInstance = this.viewFactory.create(this.eventBus, presenterInstance, viewInstanceClass);
 		
+		presenterInstance.setPresenterFactory(this);
 		presenterInstance.setEventBus(this.eventBus);
 		presenterInstance.setView(viewInstance);
 		
