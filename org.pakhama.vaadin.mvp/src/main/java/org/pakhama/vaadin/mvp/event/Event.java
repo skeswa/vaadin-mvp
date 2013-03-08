@@ -39,14 +39,30 @@ public abstract class Event implements Serializable {
 		this.source = source;
 	}
 
+	/**
+	 * Gets the entity responsible for this event being fired.
+	 * 
+	 * @return the event originator
+	 */
 	protected Object getSource() {
 		return source;
 	}
 
+	/**
+	 * Changes the scope of this event. This change is only considered the next
+	 * time that this event is triggered.
+	 * 
+	 * @param scope the new scope of this event
+	 */
 	protected void setScope(EventScope scope) {
 		this.scope = scope;
 	}
 
+	/**
+	 * Gets the scope of this event.
+	 * 
+	 * @return the scope of this event
+	 */
 	public EventScope getScope() {
 		return scope;
 	}
