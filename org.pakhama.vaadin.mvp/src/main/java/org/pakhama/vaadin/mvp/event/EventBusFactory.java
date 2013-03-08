@@ -11,7 +11,7 @@ package org.pakhama.vaadin.mvp.event;
  */
 public class EventBusFactory {
 	/**
-	 * Creates an implementation of {@link IEventBus} and returns it. 
+	 * Creates an implementation of {@link IEventBus} and returns it.
 	 * @return implementation of {@link IEventBus}
 	 */
 	public IEventBus create() {

@@ -39,11 +39,13 @@ public interface IEventBus {
 	/**
 	 * Propagates the event e to every listener method listening for it that is
 	 * also registered in this event bus. The event is propagated according to
-	 * its <code>getEventScope()</code> method which returns an
-	 * {@link EventScope}.
+	 * the <code>getScope()</code> method of the event which returns an
+	 * {@link EventScope}. The source of the event must not be null.
 	 * 
 	 * @param e
 	 *            the event to be fired
+	 * @param source
+	 *            the originator of the event being fired
 	 */
-	void fire(Event e);
+	void fire(Object source, Event e);
 }

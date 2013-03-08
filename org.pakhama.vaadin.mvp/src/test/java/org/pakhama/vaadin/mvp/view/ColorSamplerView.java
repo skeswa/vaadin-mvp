@@ -10,8 +10,7 @@ public class ColorSamplerView extends View implements IColorSamplerView {
 	}
 
 	public void trigger() {
-		fire(new RedColorChangeEvent(this));
-		fire(new BlueColorChangeEvent(this));
+		fire(new RedColorChangeEvent());
+		fire(new BlueColorChangeEvent());
 	}
-
 }

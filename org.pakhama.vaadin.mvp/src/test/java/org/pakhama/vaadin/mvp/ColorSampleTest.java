@@ -40,6 +40,30 @@ public class ColorSampleTest {
 		Assert.assertTrue(this.manager.isRedFlagged());
 		Assert.assertTrue(this.manager.isOtherColorFlagged());
 		Assert.assertFalse(this.manager.isOtherRedFlagged());
+		
+		this.manager.unflag();
+		
+		presenter.createChildren();
+		presenter.triggerTrigger();
+		Assert.assertFalse(this.manager.isFirstChildFlagged());
+		Assert.assertTrue(this.manager.isSecondChildFlagged());
+		Assert.assertTrue(this.manager.isThirdChildFlagged());
+		Assert.assertFalse(this.manager.isBlueFlagged());
+		Assert.assertFalse(this.manager.isGreenFlagged());
+		Assert.assertFalse(this.manager.isRedFlagged());
+		Assert.assertFalse(this.manager.isOtherColorFlagged());
+		Assert.assertFalse(this.manager.isOtherRedFlagged());
+		
+		this.manager.unflag();
+		
+		presenter.triggerTriggerTrigger();
+		Assert.assertTrue(this.manager.isFirstChildFlagged());
+		Assert.assertTrue(this.manager.isSecondChildFlagged());
+		Assert.assertTrue(this.manager.isThirdChildFlagged());
+		Assert.assertFalse(this.manager.isBlueFlagged());
+		Assert.assertFalse(this.manager.isGreenFlagged());
+		Assert.assertFalse(this.manager.isRedFlagged());
+		Assert.assertFalse(this.manager.isOtherColorFlagged());
+		Assert.assertFalse(this.manager.isOtherRedFlagged());
 	}
-
 }

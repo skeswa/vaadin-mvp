@@ -19,23 +19,31 @@ public abstract class Event implements Serializable {
 	private EventScope scope = EventScope.ALL;
 
 	/**
-	 * Initializes the event with the source parameter. The source is intended to be a reference to the object that fired this Event. This constructor initializes the scope of the event as  
-	 * @param source
+	 * The default constructor of the Event class. This constructor initializes
+	 * the scope of the event to <code>EventScope.ALL</code>.
 	 */
-	public Event(Object source) {
-		this.source = source;
+	public Event() {
 	}
 
-	public Event(Object source, EventScope scope) {
-		this.source = source;
+	/**
+	 * Initializes the event with the scope parameter.
+	 * 
+	 * @param scope
+	 *            propagation scope level of this event
+	 */
+	public Event(EventScope scope) {
 		this.scope = scope;
 	}
 
-	public Object getSource() {
+	void setSource(Object source) {
+		this.source = source;
+	}
+
+	protected Object getSource() {
 		return source;
 	}
 
-	public void setScope(EventScope scope) {
+	protected void setScope(EventScope scope) {
 		this.scope = scope;
 	}
 
@@ -95,7 +103,7 @@ public abstract class Event implements Serializable {
 			builder.append(scope.getClass().getName());
 		}
 		builder.append('}');
-		
+
 		return builder.toString();
 	}
 }

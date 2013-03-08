@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 
 import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.exception.EventListenerFaultException;
-import org.pakhama.vaadin.mvp.exception.EventPropagationException;
 import org.pakhama.vaadin.mvp.exception.EventRegistrationException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IView;
@@ -61,40 +60,62 @@ class EventBusImpl implements IEventBus {
 	}
 
 	@Override
-	public void fire(Event e) {
+	public void fire(Object source, Event e) {
+		if (source == null) {
+			throw new IllegalArgumentException("The source parameter cannot be null.");
+		}
 		if (e == null) {
 			throw new IllegalArgumentException("The event parameter cannot be null.");
 		}
 
+		e.setSource(source);
 		switch (e.getScope()) {
-		case PARENT:
-			if (e.getSource() instanceof Presenter<?>) {
-				Presenter<?> parent = ((Presenter<?>) e.getSource()).getParent();
-				if (parent != null) {
-					try {
-						provideEventRegistry().invoke(e, parent);
-					} catch (Throwable t) {
-						throw new EventListenerFaultException(t, e);
-					}
-					break;
-				} else {
-					throw new EventPropagationException("The source of this event (" + e.getSource()
-							+ ") had no parent. The source of the event needs a source to propagate to its parent.");
+		case CHILDREN:
+			if (source instanceof Presenter<?>) {
+				try {
+					provideEventRegistry().invokeChildren(e);
+				} catch (Throwable t) {
+					throw new EventListenerFaultException(t, e);
 				}
-			} else if (e.getSource() instanceof IView) {
-				Object parent = ((IView) e.getSource()).getOwner();
+				break;
+			}
+			break;
+		case SIBLING:
+			if (source instanceof Presenter<?>) {
+				Presenter<?> parent = ((Presenter<?>) source).getParent();
 				if (parent != null) {
 					try {
-						provideEventRegistry().invoke(e, parent);
+						provideEventRegistry().invokeSiblings(e, parent);
 					} catch (Throwable t) {
 						throw new EventListenerFaultException(t, e);
 					}
 					break;
-				} else {
-					throw new EventPropagationException("The source of this event (" + e.getSource()
-							+ ") had no parent. The source of the event needs a source to propagate to its parent.");
 				}
 			}
+			break;
+		case PARENT:
+			if (source instanceof Presenter<?>) {
+				Presenter<?> parent = ((Presenter<?>) source).getParent();
+				if (parent != null) {
+					try {
+						provideEventRegistry().invokeParent(e, parent);
+					} catch (Throwable t) {
+						throw new EventListenerFaultException(t, e);
+					}
+					break;
+				}
+			} else if (source instanceof IView) {
+				Object parent = ((IView) source).getOwner();
+				if (parent != null) {
+					try {
+						provideEventRegistry().invokeParent(e, parent);
+					} catch (Throwable t) {
+						throw new EventListenerFaultException(t, e);
+					}
+					break;
+				}
+			}
+			break;
 		case ALL:
 		default:
 			try {

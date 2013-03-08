@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
+import org.pakhama.vaadin.mvp.presenter.Presenter;
 
 class EventRegistry {
 	private Map<Class<? extends Event>, Map<Object, Collection<EventRegistryEntry>>> entries;
@@ -100,18 +101,103 @@ class EventRegistry {
 		}
 	}
 
-	void invoke(Event eventInstance, Object handlerInstance) throws Throwable {
+	void invokeSiblings(Event eventInstance, Object parentInstance) throws Throwable {
 		if (eventInstance == null) {
 			throw new IllegalArgumentException("The eventInstance parameter cannot be null.");
 		}
-		if (handlerInstance == null) {
+		if (parentInstance == null) {
+			throw new IllegalArgumentException("The parentInstance parameter cannot be null.");
+		}
+
+		Collection<Map<Object, Collection<EventRegistryEntry>>> entryMaps = getEntryMaps(eventInstance.getClass());
+		for (Map<Object, Collection<EventRegistryEntry>> entryMap : entryMaps) {
+			if (entryMap != null) {
+				Collection<EventRegistryEntry> entryCollection = null;
+				for (Entry<Object, Collection<EventRegistryEntry>> entryMapEntry : entryMap.entrySet()) {
+					entryCollection = entryMapEntry.getValue();
+					if (entryCollection != null) {
+						for (EventRegistryEntry entry : entryCollection) {
+							if ((entry.getHandlerInstance() instanceof Presenter<?>) && (parentInstance.equals(((Presenter<?>) entry.getHandlerInstance()).getParent()))
+									&& (!eventInstance.getSource().equals(entry.getHandlerInstance()))) {
+								try {
+									invokeEntry(entry, eventInstance);
+								} catch (IllegalArgumentException e) {
+									// Arguments of the listener method were not
+									// standard
+									throw new EventListenerInvocationException("Listener method " + entry.getListenerMethod()
+											+ " must have exactly one parameter (its event object) or zero parameters.");
+								} catch (IllegalAccessException e) {
+									throw new EventListenerInvocationException("Listener method " + entry.getListenerMethod()
+											+ " could not be invoked because it was inaccesible.");
+								} catch (InvocationTargetException e) {
+									// There was an exception that occurred
+									// within
+									// the
+									// listener method
+									throw e.getCause();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	void invokeChildren(Event eventInstance) throws Throwable {
+		if (eventInstance == null) {
+			throw new IllegalArgumentException("The eventInstance parameter cannot be null.");
+		}
+		if (eventInstance.getSource() == null) {
+			throw new IllegalArgumentException("The eventInstance parameter's getSource() method cannot return null.");
+		}
+
+		Collection<Map<Object, Collection<EventRegistryEntry>>> entryMaps = getEntryMaps(eventInstance.getClass());
+		for (Map<Object, Collection<EventRegistryEntry>> entryMap : entryMaps) {
+			if (entryMap != null) {
+				Collection<EventRegistryEntry> entryCollection = null;
+				for (Entry<Object, Collection<EventRegistryEntry>> entryMapEntry : entryMap.entrySet()) {
+					entryCollection = entryMapEntry.getValue();
+					if (entryCollection != null) {
+						for (EventRegistryEntry entry : entryCollection) {
+							if ((entry.getHandlerInstance() instanceof Presenter<?>) && (eventInstance.getSource().equals(((Presenter<?>) entry.getHandlerInstance()).getParent()))) {
+								try {
+									invokeEntry(entry, eventInstance);
+								} catch (IllegalArgumentException e) {
+									// Arguments of the listener method were not
+									// standard
+									throw new EventListenerInvocationException("Listener method " + entry.getListenerMethod()
+											+ " must have exactly one parameter (its event object) or zero parameters.");
+								} catch (IllegalAccessException e) {
+									throw new EventListenerInvocationException("Listener method " + entry.getListenerMethod()
+											+ " could not be invoked because it was inaccesible.");
+								} catch (InvocationTargetException e) {
+									// There was an exception that occurred
+									// within
+									// the
+									// listener method
+									throw e.getCause();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void invokeParent(Event eventInstance, Object parentInstance) throws Throwable {
+		if (eventInstance == null) {
+			throw new IllegalArgumentException("The eventInstance parameter cannot be null.");
+		}
+		if (parentInstance == null) {
 			throw new IllegalArgumentException("The handlerInstance parameter cannot be null.");
 		}
 
 		Collection<Map<Object, Collection<EventRegistryEntry>>> entryMaps = getEntryMaps(eventInstance.getClass());
 		for (Map<Object, Collection<EventRegistryEntry>> entryMap : entryMaps) {
 			if (entryMap != null) {
-				Collection<EventRegistryEntry> entryCollection = entryMap.get(handlerInstance);
+				Collection<EventRegistryEntry> entryCollection = entryMap.get(parentInstance);
 				if (entryCollection != null) {
 					for (EventRegistryEntry entry : entryCollection) {
 						try {

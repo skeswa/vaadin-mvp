@@ -2,10 +2,25 @@ package org.pakhama.vaadin.mvp.presenter;
 
 import java.io.Serializable;
 
+import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEventBus;
+import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.exception.IncompatibleViewException;
 import org.pakhama.vaadin.mvp.view.IView;
 
+/**
+ * Presenters are responsible for applying data to their corresponding views
+ * (what the user is able to see). Presenters are created with the  Presenters often know what data to paint by
+ * receiving and handling events. Events are handled by methods in the presenter
+ * with the {@link Listener} annotation. All presenters have a view which
+ * implements the {@link IView} interface. Presenters can create other
+ * presenters called Child Presenters. A child presenter has the ability to
+ * propagate events directly to its parent presenter.
+ * 
+ * @author Sandile
+ * 
+ * @param <T> the view type of this presenter
+ */
 public abstract class Presenter<T extends IView> implements Serializable {
 	private static final long serialVersionUID = 5131211825391491296L;
 
@@ -39,8 +54,17 @@ public abstract class Presenter<T extends IView> implements Serializable {
 		}
 	}
 
+	/**
+	 * Propagates the event e to every listener method listening for it that is
+	 * also registered in this presenter's event bus. The event is propagated
+	 * according to the <code>getScope()</code> method of the event which
+	 * returns an {@link EventScope}.
+	 * 
+	 * @param e
+	 *            the event to be fired
+	 */
 	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
-		this.eventBus.fire(e);
+		this.eventBus.fire(this, e);
 	}
 
 	void setEventBus(IEventBus eventBus) {
@@ -88,7 +112,8 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	 * This means that the new child presenter will have the option to propagate
 	 * events only to this presenter.
 	 * 
-	 * @param childPresenterClass the class of the child presenter
+	 * @param childPresenterClass
+	 *            the class of the child presenter
 	 * @return a new instance of the child presenter class
 	 */
 	protected Presenter<? extends IView> createChild(Class<? extends Presenter<? extends IView>> childPresenterClass) {
@@ -104,22 +129,22 @@ public abstract class Presenter<T extends IView> implements Serializable {
 		if (view == null) {
 			builder.append("<null view>, ");
 		} else {
-			builder.append(view.getClass().getName());
+			builder.append(view.getClass().getSimpleName());
 			builder.append(", ");
 		}
 		if (eventBus == null) {
 			builder.append("<null event bus>, ");
 		} else {
-			builder.append(eventBus.getClass().getName());
+			builder.append(eventBus.getClass().getSimpleName());
 			builder.append(", ");
 		}
 		if (parent == null) {
 			builder.append("<null parent>");
 		} else {
-			builder.append(parent.getClass().getName());
+			builder.append(parent.getClass().getSimpleName());
 		}
 		builder.append('}');
-		
+
 		return builder.toString();
 	}
 }

@@ -7,6 +7,9 @@ public class ColorSampleTestManager {
 	private boolean isRedFlagged = false;
 	private boolean isBlueFlagged = false;
 	private boolean isGreenFlagged = false;
+	private boolean isFirstChildFlagged = false;
+	private boolean isSecondChildFlagged = false;
+	private boolean isThirdChildFlagged = false;
 
 	public void flagRed() {
 		this.isRedFlagged = true;
@@ -31,6 +34,9 @@ public class ColorSampleTestManager {
 		this.isColorFlagged = false;
 		this.isOtherColorFlagged = false;
 		this.isOtherRedFlagged = false;
+		this.isFirstChildFlagged = false;
+		this.isSecondChildFlagged = false;
+		this.isThirdChildFlagged = false;
 	}
 
 	public boolean isColorFlagged() {
@@ -63,5 +69,29 @@ public class ColorSampleTestManager {
 
 	public void flagOtherRed() {
 		this.isOtherRedFlagged = true;
+	}
+
+	public boolean isFirstChildFlagged() {
+		return isFirstChildFlagged;
+	}
+
+	public void flagFirstChild() {
+		this.isFirstChildFlagged = true;
+	}
+
+	public boolean isSecondChildFlagged() {
+		return isSecondChildFlagged;
+	}
+
+	public void flagSecondChild() {
+		this.isSecondChildFlagged = true;
+	}
+
+	public boolean isThirdChildFlagged() {
+		return isThirdChildFlagged;
+	}
+
+	public void flagThirdChild() {
+		this.isThirdChildFlagged = true;
 	}
 }

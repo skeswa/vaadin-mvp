@@ -24,7 +24,7 @@ public abstract class View extends VerticalLayout implements IView {
 	}
 	
 	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
-		this.eventBus.fire(e);
+		this.eventBus.fire(this, e);
 	}
 	
 	@Override
