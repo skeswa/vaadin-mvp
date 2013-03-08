@@ -1,5 +1,7 @@
 package org.pakhama.vaadin.mvp.view;
 
+import org.pakhama.vaadin.mvp.presenter.PresenterFactory;
+
 import com.vaadin.ui.Component;
 
 /**
@@ -22,9 +24,11 @@ public interface IView extends Component {
 
 	/**
 	 * Returns a reference to the owner of this view if it exists. If the owner
-	 * of this view does not exist, this method returns null.
+	 * of this view does not exist, this method returns null. <b>Note:</b> the
+	 * owner of a {@link View} is its {@link Presenter} when created by a
+	 * {@link PresenterFactory}.
 	 * 
-	 * @return the parent of this view
+	 * @return the owner of this view
 	 */
 	Object getOwner();
 }
