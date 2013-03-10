@@ -1,5 +1,6 @@
 package org.pakhama.vaadin.mvp.presenter;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 
 import org.pakhama.vaadin.mvp.event.IEventBus;
@@ -11,11 +12,13 @@ import org.pakhama.vaadin.mvp.view.ViewFactory;
 /**
  * Creates new instances of {@link Presenter}. To create a presenter factory,
  * you must first create an {@link IEventBus} for the presenter factory to
- * register new presenters against.
+ * register new presenters under.
  * 
  * @author Sandile
  */
-public class PresenterFactory {
+public class PresenterFactory implements Serializable {
+	private static final long serialVersionUID = 2864312773902372753L;
+	
 	private IEventBus eventBus;
 	private ViewFactory viewFactory;
 

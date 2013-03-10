@@ -1,5 +1,6 @@
 package org.pakhama.vaadin.mvp.view;
 
+import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.presenter.PresenterFactory;
 
 import com.vaadin.ui.Component;

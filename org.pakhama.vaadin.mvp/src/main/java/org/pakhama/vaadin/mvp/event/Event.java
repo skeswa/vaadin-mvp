@@ -2,6 +2,7 @@ package org.pakhama.vaadin.mvp.event;
 
 import java.io.Serializable;
 
+import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 
 /**

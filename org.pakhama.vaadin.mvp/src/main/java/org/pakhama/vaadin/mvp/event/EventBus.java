@@ -8,7 +8,9 @@ import org.pakhama.vaadin.mvp.exception.EventRegistrationException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IView;
 
-class EventBusImpl implements IEventBus {
+class EventBus implements IEventBus {
+	private static final long serialVersionUID = -5989527350073214759L;
+	
 	private EventRegistry eventRegistry;
 
 	private EventRegistry provideEventRegistry() {

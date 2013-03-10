@@ -19,6 +19,10 @@ public abstract class View extends VerticalLayout implements IView {
 
 	private IEventBus eventBus;
 	private Presenter<? extends IView> presenter;
+	
+	public View() {
+		setSizeFull();
+	}
 
 	void setPresenter(Presenter<? extends IView> presenter) {
 		if (this.presenter == null) {

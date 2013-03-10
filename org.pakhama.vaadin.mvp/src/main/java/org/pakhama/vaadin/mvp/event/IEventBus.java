@@ -1,5 +1,7 @@
 package org.pakhama.vaadin.mvp.event;
 
+import java.io.Serializable;
+
 import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IView;
@@ -12,7 +14,7 @@ import org.pakhama.vaadin.mvp.view.IView;
  * 
  * @author Sandile
  */
-public interface IEventBus {
+public interface IEventBus extends Serializable {
 	/**
 	 * Registers a presenter to this event bus. This means that all methods with
 	 * a {@link Listener} annotation will be able to listen to and handle

@@ -15,7 +15,7 @@ public class EventBusFactory {
 	 * @return implementation of {@link IEventBus}
 	 */
 	public IEventBus create() {
-		return new EventBusImpl();
+		return new EventBus();
 	}
 
 }

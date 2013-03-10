@@ -1,5 +1,7 @@
 package org.pakhama.vaadin.mvp.view;
 
+import java.io.Serializable;
+
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.InaccessibleViewException;
 import org.pakhama.vaadin.mvp.exception.ViewConstructionException;
@@ -13,17 +15,8 @@ import org.pakhama.vaadin.mvp.presenter.Presenter;
  * @author Sandile
  * 
  */
-public class ViewFactory {
-	/**
-	 * Creates a new instance of the provided Class<? extends IView>. New
-	 * presenters are automatically registered against the event bus used to
-	 * construct this factory. The view instance for each presenter instance is
-	 * also automatically injected.
-	 * 
-	 * @param presenterClass
-	 *            the type of presenter to create a new instance of
-	 * @return the new instance of the provided presenter type
-	 */
+public class ViewFactory implements Serializable {
+	private static final long serialVersionUID = 1746553215095831890L;
 
 	/**
 	 * Creates a new instance of the provided view class. The provided event bus
