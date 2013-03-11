@@ -19,7 +19,7 @@ public abstract class View extends VerticalLayout implements IView {
 
 	private IEventBus eventBus;
 	private Presenter<? extends IView> presenter;
-	
+
 	public View() {
 		setSizeFull();
 	}
@@ -38,15 +38,31 @@ public abstract class View extends VerticalLayout implements IView {
 
 	/**
 	 * Propagates the event e to every listener method listening for it that is
-	 * also registered in this presenter's event bus. The event is propagated
-	 * according to the <code>getScope()</code> method of the event which
-	 * returns an {@link EventScope}.
+	 * also registered in this view's event bus. The event is
+	 * propagated according to the <code>getScope()</code> method of the event
+	 * which returns an {@link EventScope}.
 	 * 
 	 * @param e
 	 *            the event to be fired
 	 */
 	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
 		this.eventBus.fire(this, e);
+	}
+
+	/**
+	 * Propagates the event e to every listener method listening for it that is
+	 * also registered in this view's event bus. The event is
+	 * propagated according to the scope parameter <b>regardless</b> of the
+	 * scope of the actual event. The scope parameter will <b>override the fired
+	 * event's current scope</b>.
+	 * 
+	 * @param e
+	 *            the event to be fired
+	 * @param scope
+	 *            the scope to fire this event with
+	 */
+	protected void fire(org.pakhama.vaadin.mvp.event.Event e, EventScope scope) {
+		this.eventBus.fire(this, scope, e);
 	}
 
 	@Override

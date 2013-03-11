@@ -117,7 +117,7 @@ public abstract class Event implements Serializable {
 		if (scope == null) {
 			builder.append("<null scope>");
 		} else {
-			builder.append(scope.getClass().getName());
+			builder.append(scope);
 		}
 		builder.append('}');
 

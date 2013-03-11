@@ -129,4 +129,14 @@ class EventBus implements IEventBus {
 		}
 	}
 
+	@Override
+	public void fire(Object source, EventScope scope, Event e) {
+		if (scope == null) {
+			throw new IllegalArgumentException("The scope parameter cannot be null.");
+		}
+		
+		e.setScope(scope);
+		fire(source, e);
+	}
+
 }

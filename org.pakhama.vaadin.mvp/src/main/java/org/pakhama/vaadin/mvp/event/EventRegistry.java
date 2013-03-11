@@ -1,5 +1,6 @@
 package org.pakhama.vaadin.mvp.event;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,7 +13,9 @@ import java.util.Map.Entry;
 import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 
-class EventRegistry {
+class EventRegistry implements Serializable {
+	private static final long serialVersionUID = -7950670068115942889L;
+	
 	private Map<Class<? extends Event>, Map<Object, Collection<EventRegistryEntry>>> entries;
 
 	public EventRegistry() {

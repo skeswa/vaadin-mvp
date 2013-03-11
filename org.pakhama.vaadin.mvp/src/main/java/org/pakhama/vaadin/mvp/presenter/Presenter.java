@@ -10,16 +10,18 @@ import org.pakhama.vaadin.mvp.view.IView;
 
 /**
  * Presenters are responsible for applying data to their corresponding views
- * (what the user is able to see). Presenters are created with the  Presenters often know what data to paint by
- * receiving and handling events. Events are handled by methods in the presenter
- * with the {@link Listener} annotation. All presenters have a view which
- * implements the {@link IView} interface. Presenters can create other
- * presenters called Child Presenters. A child presenter has the ability to
- * propagate events directly to its parent presenter.
+ * (what the user is able to see). Presenters are created with the Presenters
+ * often know what data to paint by receiving and handling events. Events are
+ * handled by methods in the presenter with the {@link Listener} annotation. All
+ * presenters have a view which implements the {@link IView} interface.
+ * Presenters can create other presenters called Child Presenters. A child
+ * presenter has the ability to propagate events directly to its parent
+ * presenter.
  * 
  * @author Sandile
  * 
- * @param <T> the view type of this presenter
+ * @param <T>
+ *            the view type of this presenter
  */
 public abstract class Presenter<T extends IView> implements Serializable {
 	private static final long serialVersionUID = 5131211825391491296L;
@@ -65,6 +67,22 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	 */
 	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
 		this.eventBus.fire(this, e);
+	}
+
+	/**
+	 * Propagates the event e to every listener method listening for it that is
+	 * also registered in this presenter's event bus. The event is propagated
+	 * according to the scope parameter <b>regardless</b> of the scope of the
+	 * actual event. The scope parameter will <b>override the fired event's
+	 * current scope</b>.
+	 * 
+	 * @param e
+	 *            the event to be fired
+	 * @param scope
+	 *            the scope to fire this event with
+	 */
+	protected void fire(org.pakhama.vaadin.mvp.event.Event e, EventScope scope) {
+		this.eventBus.fire(this, scope, e);
 	}
 
 	void setEventBus(IEventBus eventBus) {

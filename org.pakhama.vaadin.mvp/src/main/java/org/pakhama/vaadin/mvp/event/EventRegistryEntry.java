@@ -1,8 +1,11 @@
 package org.pakhama.vaadin.mvp.event;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
-class EventRegistryEntry {
+class EventRegistryEntry implements Serializable {
+	private static final long serialVersionUID = -6269452645213195412L;
+
 	private static final int HASH_CODE_CONSTANT = 17;
 	
 	private Object handlerInstance;

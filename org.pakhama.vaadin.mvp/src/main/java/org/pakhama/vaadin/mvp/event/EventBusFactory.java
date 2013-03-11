@@ -1,5 +1,7 @@
 package org.pakhama.vaadin.mvp.event;
 
+import java.io.Serializable;
+
 /**
  * Creates new instances of {@link IEventBus}. However, event busses are
  * intended to exist in a one-eventbus-per-session scheme. This is because
@@ -9,7 +11,9 @@ package org.pakhama.vaadin.mvp.event;
  * 
  * @author Sandile
  */
-public class EventBusFactory {
+public class EventBusFactory implements Serializable {
+	private static final long serialVersionUID = -6335972206494100881L;
+
 	/**
 	 * Creates an implementation of {@link IEventBus} and returns it.
 	 * @return implementation of {@link IEventBus}

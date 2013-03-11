@@ -50,4 +50,21 @@ public interface IEventBus extends Serializable {
 	 *            the originator of the event being fired
 	 */
 	void fire(Object source, Event e);
+
+	/**
+	 * Propagates the event e to every listener method listening for it that is
+	 * also registered in this event bus. The event is propagated according to
+	 * the <code>getScope()</code> method of the event which returns an
+	 * {@link EventScope}. The source of the event must not be null. This
+	 * overload also will override the scope of the event its firing. The scope
+	 * must not be null.
+	 * 
+	 * @param e
+	 *            the event to be fired
+	 * @param scope
+	 *            the scope to fire this event with
+	 * @param source
+	 *            the originator of the event being fired
+	 */
+	void fire(Object source, EventScope scope, Event e);
 }
