@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import org.pakhama.vaadin.mvp.event.annotation.Listener;
 import org.pakhama.vaadin.mvp.exception.EventListenerFaultException;
 import org.pakhama.vaadin.mvp.exception.EventRegistrationException;
+import org.pakhama.vaadin.mvp.presenter.IPresenter;
 import org.pakhama.vaadin.mvp.presenter.Presenter;
 import org.pakhama.vaadin.mvp.view.IView;
 
@@ -22,16 +23,16 @@ class EventBus implements IEventBus {
 	}
 
 	@Override
-	public void register(Presenter<? extends IView> presenter) {
+	public void register(IPresenter<? extends IView> presenter) {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter cannot be null.");
 		}
 
 		Method[] methods = presenter.getClass().getMethods();
-		Listener listener = null;
+		EventListener listener = null;
 		for (Method method : methods) {
 			if (method != null) {
-				if ((listener = method.getAnnotation(Listener.class)) != null) {
+				if ((listener = method.getAnnotation(EventListener.class)) != null) {
 					if (listener.event() == null) {
 						throw new EventRegistrationException("Listener method " + method
 								+ " could not be registered because the event parameter of the @Listener annotation was null.");
@@ -53,7 +54,7 @@ class EventBus implements IEventBus {
 	}
 
 	@Override
-	public void unregister(Presenter<? extends IView> presenter) {
+	public void unregister(IPresenter<? extends IView> presenter) {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter must not be null.");
 		}
@@ -84,7 +85,7 @@ class EventBus implements IEventBus {
 			break;
 		case SIBLING:
 			if (source instanceof Presenter<?>) {
-				Presenter<?> parent = ((Presenter<?>) source).getParent();
+				IPresenter<?> parent = ((Presenter<?>) source).getParent();
 				if (parent != null) {
 					try {
 						provideEventRegistry().invokeSiblings(e, parent);
@@ -97,7 +98,7 @@ class EventBus implements IEventBus {
 			break;
 		case PARENT:
 			if (source instanceof Presenter<?>) {
-				Presenter<?> parent = ((Presenter<?>) source).getParent();
+				IPresenter<?> parent = ((Presenter<?>) source).getParent();
 				if (parent != null) {
 					try {
 						provideEventRegistry().invokeParent(e, parent);

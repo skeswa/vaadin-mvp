@@ -32,5 +32,5 @@ public enum EventScope {
 	 * Propagate the event to all event listeners registered under the event bus
 	 * firing the event. This scope is the default for all events.
 	 */
-	ALL
+	UNIVERAL
 }

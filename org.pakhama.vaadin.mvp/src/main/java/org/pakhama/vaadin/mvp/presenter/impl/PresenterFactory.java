@@ -7,6 +7,7 @@ import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.InaccessiblePresenterException;
 import org.pakhama.vaadin.mvp.exception.PresenterConstructionException;
 import org.pakhama.vaadin.mvp.view.IView;
+import org.pakhama.vaadin.mvp.view.View;
 import org.pakhama.vaadin.mvp.view.ViewFactory;
 
 /**
@@ -18,7 +19,7 @@ import org.pakhama.vaadin.mvp.view.ViewFactory;
  */
 public class PresenterFactory implements Serializable {
 	private static final long serialVersionUID = 2864312773902372753L;
-	
+
 	private IEventBus eventBus;
 	private ViewFactory viewFactory;
 
@@ -32,9 +33,11 @@ public class PresenterFactory implements Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	<T extends Presenter<? extends IView>> T create(Class<T> presenterClass, Presenter<? extends IView> parent) {
-		Presenter<? extends IView> childPresenter = create(presenterClass);
-		childPresenter.setParent(parent);
+	<T extends IPresenter<? extends IView>> T create(Class<T> presenterClass, IPresenter<? extends IView> parent) {
+		IPresenter<? extends IView> childPresenter = create(presenterClass);
+		if (childPresenter instanceof Presenter<?>) {
+			((Presenter<?>) childPresenter).setParent(parent);
+		}
 		return (T) childPresenter;
 	}
 
@@ -49,7 +52,7 @@ public class PresenterFactory implements Serializable {
 	 * @return the new instance of the provided presenter type
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends Presenter<? extends IView>> T create(Class<T> presenterClass) {
+	public <T extends IPresenter<? extends IView>> T create(Class<T> presenterClass) {
 		if (presenterClass == null) {
 			throw new IllegalArgumentException("The presenterClass parameter cannot be null.");
 		}
@@ -62,7 +65,7 @@ public class PresenterFactory implements Serializable {
 			throw new IllegalArgumentException("The viewClass, specified in the generic of the presenterClass parameter, must implement " + IView.class.getName() + ".");
 		}
 
-		Presenter<? extends IView> presenterInstance = null;
+		IPresenter<? extends IView> presenterInstance = null;
 		try {
 			presenterInstance = presenterClass.newInstance();
 		} catch (InstantiationException e) {
@@ -71,25 +74,26 @@ public class PresenterFactory implements Serializable {
 			throw new InaccessiblePresenterException();
 		}
 
-		Class<? extends IView> viewInstanceClass = presenterInstance.view();
-		if (viewInstanceClass == null) {
-			throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName()
-					+ ") returned null. It must return the class of the implementation of the presenter's view (" + viewClass + ").");
+		if (presenterInstance instanceof Presenter<?>) {
+			((Presenter<?>) presenterInstance).setPresenterFactory(this);
+			((Presenter<?>) presenterInstance).setEventBus(this.eventBus);
+			
+			Class<? extends IView> viewInstanceClass = ((Presenter<?>) presenterInstance).view();
+			if (viewInstanceClass == null) {
+				throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName()
+						+ ") returned null. It must return the class of the implementation of the presenter's view (" + viewClass + ").");
+			}
+			if (!viewClass.isAssignableFrom(viewInstanceClass)) {
+				throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName()
+						+ ") returned a type that didn't implement this presenter's view (" + viewClass + ").");
+			}
+			IView viewInstance = this.viewFactory.create(this.eventBus, presenterInstance, viewInstanceClass);
+			viewInstance.init();
+			
+			((Presenter<?>) presenterInstance).setView((View) viewInstance);
 		}
-		if (!viewClass.isAssignableFrom(viewInstanceClass)) {
-			throw new PresenterConstructionException("The view() method of this presenter type (" + presenterClass.getName()
-					+ ") returned a type that didn't implement this presenter's view (" + viewClass + ").");
-		}
-
-		IView viewInstance = this.viewFactory.create(this.eventBus, presenterInstance, viewInstanceClass);
-
-		presenterInstance.setPresenterFactory(this);
-		presenterInstance.setEventBus(this.eventBus);
-		presenterInstance.setView(viewInstance);
 
 		this.eventBus.register(presenterInstance);
-
-		viewInstance.init();
 		presenterInstance.init();
 
 		return (T) presenterInstance;

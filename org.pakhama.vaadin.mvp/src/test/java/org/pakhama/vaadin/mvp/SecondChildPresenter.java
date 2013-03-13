@@ -20,7 +20,7 @@ public class SecondChildPresenter extends Presenter<IOtherView> {
 		return OtherView.class;
 	}
 	
-	@Listener(event = ColorChangeEvent.class)
+	@EventListener(event = ColorChangeEvent.class)
 	public void colorChange() {
 		if (testManager != null) {
 			testManager.flagSecondChild();

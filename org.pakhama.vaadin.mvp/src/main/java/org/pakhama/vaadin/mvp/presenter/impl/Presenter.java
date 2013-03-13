@@ -1,18 +1,17 @@
 package org.pakhama.vaadin.mvp.presenter;
 
-import java.io.Serializable;
-
+import org.pakhama.vaadin.mvp.annotation.Injection;
+import org.pakhama.vaadin.mvp.event.Event;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.annotation.Listener;
-import org.pakhama.vaadin.mvp.exception.IncompatibleViewException;
 import org.pakhama.vaadin.mvp.view.IView;
 
 /**
  * Presenters are responsible for applying data to their corresponding views
  * (what the user is able to see). Presenters are created with the Presenters
  * often know what data to paint by receiving and handling events. Events are
- * handled by methods in the presenter with the {@link Listener} annotation. All
+ * handled by methods in the presenter with the {@link EventListener} annotation. All
  * presenters have a view which implements the {@link IView} interface.
  * Presenters can create other presenters called Child Presenters. A child
  * presenter has the ability to propagate events directly to its parent
@@ -23,31 +22,30 @@ import org.pakhama.vaadin.mvp.view.IView;
  * @param <T>
  *            the view type of this presenter
  */
-public abstract class Presenter<T extends IView> implements Serializable {
+public abstract class Presenter<T extends IView> implements IPresenter<T> {
 	private static final long serialVersionUID = 5131211825391491296L;
 
-	private Presenter<? extends IView> parent;
+	private IPresenter<? extends IView> parent;
+	@Injection
 	private T view;
+	@Injection
 	private IEventBus eventBus;
-	private PresenterFactory factory;
-
+	@Injection
+	private IPresenterFactory factory;
+	
 	/**
-	 * Gets this presenters view. The type of this view is specified by the type
-	 * of the generic for this class.
+	 * This method returns the type of the implementation of the this
+	 * presenter's {@link IView}. It should not return <code>null</code>, and
+	 * the view implementation must implement the view type of this presenter as
+	 * specified in the generic of this class.
 	 * 
-	 * @return this presenter's view
+	 * @return the class of the view implementation for this presenter
 	 */
+	protected abstract Class<? extends T> view();
+
+	@Override
 	public T getView() {
 		return view;
-	}
-
-	@SuppressWarnings("unchecked")
-	void setView(IView view) {
-		try {
-			this.view = (T) view;
-		} catch (ClassCastException e) {
-			throw new IncompatibleViewException(view, this);
-		}
 	}
 
 	void setPresenterFactory(PresenterFactory factory) {
@@ -65,7 +63,7 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	 * @param e
 	 *            the event to be fired
 	 */
-	protected void fire(org.pakhama.vaadin.mvp.event.Event e) {
+	protected void fire(Event e) {
 		this.eventBus.fire(this, e);
 	}
 
@@ -97,45 +95,17 @@ public abstract class Presenter<T extends IView> implements Serializable {
 	 * 
 	 * @return the parent presenter or null if no such parent presenter exists
 	 */
-	public Presenter<? extends IView> getParent() {
+	public IPresenter<? extends IView> getParent() {
 		return this.parent;
 	}
 
-	void setParent(Presenter<? extends IView> parent) {
+	void setParent(IPresenter<? extends IView> parent) {
 		this.parent = parent;
 	}
 
-	/**
-	 * This method is called when this presenter is ready to be initialized. At
-	 * this point, this presenter has a refeence to its event bus, parent and
-	 * view. <b>However,</b> before this method is called, all the getters for
-	 * the previously mentioned field will return <b>null values</b>. The
-	 * <code>init()</code> method of any presenter is always invoked after its
-	 * view's <code>init()</code> method.
-	 */
-	public abstract void init();
-
-	/**
-	 * This method simply returns the chosen implementation of the this
-	 * presenter's view interface. It should not return null, and the view
-	 * implementation must implement the view interface of this presenter (as
-	 * specified in the generic of this class).
-	 * 
-	 * @return the class of the view implementation for this presenter
-	 */
-	public abstract Class<? extends T> view();
-
-	/**
-	 * Create a new presenter that will refer to this presenter as its parent.
-	 * This means that the new child presenter will have the option to propagate
-	 * events only to this presenter.
-	 * 
-	 * @param childPresenterClass
-	 *            the class of the child presenter
-	 * @return a new instance of the child presenter class
-	 */
-	protected Presenter<? extends IView> createChild(Class<? extends Presenter<? extends IView>> childPresenterClass) {
-		return this.factory.create(childPresenterClass, this);
+	@Override
+	public <E extends Presenter<? extends IView>> E createChild(Class<E> presenterClass) {
+		return this.factory.create(presenterClass, null);
 	}
 
 	@Override

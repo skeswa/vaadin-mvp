@@ -21,14 +21,14 @@ public class OtherPresenter extends Presenter<IOtherView> {
 		return OtherView.class;
 	}
 	
-	@Listener(event = ColorChangeEvent.class)
+	@EventListener(event = ColorChangeEvent.class)
 	public void colorChange() {
 		if (testManager != null) {
 			testManager.flagOtherColor();
 		}
 	}
 	
-	@Listener(event = RedColorChangeEvent.class)
+	@EventListener(event = RedColorChangeEvent.class)
 	public void red() {
 		if (testManager != null) {
 			testManager.flagOtherRed();
