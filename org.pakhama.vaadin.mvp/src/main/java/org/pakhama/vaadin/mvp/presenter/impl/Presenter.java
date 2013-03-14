@@ -1,7 +1,6 @@
 package org.pakhama.vaadin.mvp.presenter.impl;
 
 import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
-import org.pakhama.vaadin.mvp.annotation.field.ParentPresenterField;
 import org.pakhama.vaadin.mvp.annotation.field.PresenterFactoryField;
 import org.pakhama.vaadin.mvp.annotation.field.ViewField;
 import org.pakhama.vaadin.mvp.event.EventScope;
@@ -14,8 +13,6 @@ import org.pakhama.vaadin.mvp.view.IView;
 public class Presenter<T extends IView> implements IPresenter<T> {
 	private static final long serialVersionUID = 5131211825391491296L;
 
-	@ParentPresenterField
-	private IPresenter<? extends IView> parent;
 	@ViewField
 	private T view;
 	@EventBusField
@@ -41,15 +38,9 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			builder.append(", ");
 		}
 		if (eventBus == null) {
-			builder.append("<null event bus>, ");
+			builder.append("<null event bus>");
 		} else {
 			builder.append(eventBus.getClass().getSimpleName());
-			builder.append(", ");
-		}
-		if (parent == null) {
-			builder.append("<null parent>");
-		} else {
-			builder.append(parent.getClass().getSimpleName());
 		}
 		builder.append('}');
 
@@ -75,12 +66,7 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 
 		this.eventBus.propagate(event, this, scope);
 	}
-
-	@Override
-	public IPresenter<? extends IView> getParent() {
-		return this.parent;
-	}
-
+	
 	@Override
 	public <E extends IPresenter<? extends IView>> E createChild(Class<E> presenterClass) {
 		E child = this.factory.create(presenterClass, this);
@@ -97,7 +83,6 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 		this.eventBus = null;
 		this.factory = null;
 		this.view = null;
-		this.parent = null;
 
 		try {
 			finalize();
@@ -105,5 +90,24 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			// Doesn't matter if finalize failed, just called to mark this class
 			// as garbage
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = 119 + getClass().getName().hashCode();
+		if (view != null) {
+			result += view.hashCode();
+		}
+		result = (31 * result);
+		if (eventBus != null) {
+			result += eventBus.hashCode();
+		}
+		result = (31 * result);
+		if (factory != null) {
+			result += factory.hashCode();
+		}
+		result = (31 * result);
+		
+		return result;
 	}
 }

@@ -41,8 +41,8 @@ class PresenterRegistryNode {
 			this.children = new ArrayList<PresenterRegistryNode>();
 		}
 		
-		child.setParent(child);
 		if (!this.children.contains(child)) {
+			child.setParent(child);
 			this.children.add(child);
 		}
 	}
@@ -64,9 +64,32 @@ class PresenterRegistryNode {
 	@Override
 	public int hashCode() {
 		if (data == null) {
-			return 29;
+			return super.hashCode();
 		} else {
 			return 29 + (31 * this.data.hashCode());
+		}
+	}
+	
+	void kill() {
+		if (this.parent != null) {
+			this.parent.removeChild(this);
+		}
+		
+		for (PresenterRegistryNode child : this.children) {
+			if (child != null) {
+				child.setParent(null);
+			}
+		}
+		
+		this.children.clear();
+		
+		this.children = null;
+		this.data = null;
+		this.parent = null;
+		
+		try {
+			finalize();
+		} catch (Throwable e) {
 		}
 	}
 }

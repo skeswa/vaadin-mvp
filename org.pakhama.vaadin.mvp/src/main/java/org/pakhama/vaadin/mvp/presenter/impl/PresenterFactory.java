@@ -91,7 +91,7 @@ public class PresenterFactory implements IPresenterFactory {
 			throw new PresenterConstructionException("IPresenter implementation " + presenterClass + " could not have its required fields initialized.", e);
 		}
 		// Register the presenter-view pair to the presenter registry
-		this.presenterRegistry.register(presenterInstance, viewInstance);
+		this.presenterRegistry.register(presenterInstance, null, viewInstance);
 		// Fire the initialization methods to begin the life cycle of the
 		// respective view and presenter
 		viewInstance.onBind();
@@ -154,7 +154,7 @@ public class PresenterFactory implements IPresenterFactory {
 					+ " could not have its parent presenter field, annotated with @ParentPresenterField, initialized.", e);
 		}
 		// Register the presenter-view pair to the presenter registry
-		this.presenterRegistry.register(presenterInstance, viewInstance);
+		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
 		// Fire the initialization methods to begin the life cycle of the
 		// respective view and presenter
 		viewInstance.onBind();
