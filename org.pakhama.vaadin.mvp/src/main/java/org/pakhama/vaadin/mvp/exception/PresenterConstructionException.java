@@ -9,6 +9,11 @@ public class PresenterConstructionException extends RuntimeException {
 		this.message = message;
 	}
 	
+	public PresenterConstructionException(String message, Throwable cause) {
+		initCause(cause);
+		this.message = message;
+	}
+	
 	@Override
 	public String getMessage() {
 		return this.message;

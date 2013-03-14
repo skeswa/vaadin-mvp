@@ -1,23 +1,19 @@
 package org.pakhama.vaadin.mvp.view.impl;
 
 import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
-import org.pakhama.vaadin.mvp.annotation.field.ParentPresenterField;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
-import org.pakhama.vaadin.mvp.presenter.IPresenter;
 import org.pakhama.vaadin.mvp.view.IView;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
-public abstract class View extends VerticalLayout implements IView {
+public class View extends VerticalLayout implements IView {
 	private static final long serialVersionUID = 5552315123806395809L;
 
 	@EventBusField
 	private IEventBus eventBus;
-	@ParentPresenterField
-	private IPresenter<? extends IView> presenter;
 
 	View() {
 		setSizeFull();
@@ -29,12 +25,6 @@ public abstract class View extends VerticalLayout implements IView {
 		builder.append(getClass().getSimpleName());
 		builder.append(':');
 		builder.append('{');
-		if (presenter == null) {
-			builder.append("<null presenter>, ");
-		} else {
-			builder.append(presenter.getClass().getName());
-			builder.append(", ");
-		}
 		if (eventBus == null) {
 			builder.append("<null event bus>");
 		} else {
@@ -66,18 +56,21 @@ public abstract class View extends VerticalLayout implements IView {
 	}
 
 	public void onBind() {
+		// Does nothing by default, intended to be overridden
 	}
 
 	public void onUnbind() {
 		this.eventBus = null;
-		this.presenter = null;
 		detach();
+
 		try {
 			finalize();
 		} catch (Throwable e) {
+			// Doesn't matter if finalize failed, just called to mark this class
+			// as garbage
 		}
 	}
-	
+
 	@Override
 	public Component getComponent() {
 		return this;

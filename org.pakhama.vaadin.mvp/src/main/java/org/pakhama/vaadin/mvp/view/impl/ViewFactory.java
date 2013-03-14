@@ -99,4 +99,9 @@ public class ViewFactory implements IViewFactory {
 		}
 	}
 
+	@Override
+	public IViewRegistry getRegistry() {
+		return this.registry;
+	}
+
 }

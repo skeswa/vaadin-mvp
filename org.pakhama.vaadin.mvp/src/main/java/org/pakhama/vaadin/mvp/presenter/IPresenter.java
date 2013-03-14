@@ -8,4 +8,7 @@ public interface IPresenter<T extends IView> extends IEventHandler, IEventDispat
 	T getView();
 	IPresenter<? extends IView> getParent();
 	<E extends IPresenter<? extends IView>> E createChild(Class<E> presenterClass);
+	
+	void onBind();
+	void onUnbind();
 }
