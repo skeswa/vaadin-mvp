@@ -9,5 +9,5 @@ public interface IEventDelegateRegistry extends Serializable {
 	void clear();
 	
 	Collection<IEventDelegate> find(Class<? extends IEvent> eventClass);
-	Collection<IEventDelegate> find(Collection<IEventHandler> handlers);
+	Collection<IEventDelegate> find(Class<? extends IEvent> eventClass, Collection<IEventHandler> handlers);
 }

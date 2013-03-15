@@ -16,6 +16,7 @@ import org.pakhama.vaadin.mvp.exception.EventListenerRegistrationException;
 public class EventDelegateRegistry implements IEventDelegateRegistry {
 	private static final long serialVersionUID = -6658219565978880435L;
 
+	// TODO: We need a Map<Class<? extends IEvent>, Map<IEventHandler, Collection<IEventDelegate>>>
 	private HashMap<Class<? extends IEvent>, HashSet<IEventDelegate>> eventMap = new HashMap<Class<? extends IEvent>, HashSet<IEventDelegate>>();
 	private HashMap<IEventHandler, HashSet<IEventDelegate>> handlerMap = new HashMap<IEventHandler, HashSet<IEventDelegate>>();
 
