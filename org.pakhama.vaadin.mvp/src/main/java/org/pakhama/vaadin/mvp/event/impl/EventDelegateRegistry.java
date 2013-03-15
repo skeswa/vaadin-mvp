@@ -16,9 +16,8 @@ import org.pakhama.vaadin.mvp.exception.EventListenerRegistrationException;
 public class EventDelegateRegistry implements IEventDelegateRegistry {
 	private static final long serialVersionUID = -6658219565978880435L;
 
-	// TODO: We need a Map<Class<? extends IEvent>, Map<IEventHandler, Collection<IEventDelegate>>>
 	private HashMap<Class<? extends IEvent>, HashSet<IEventDelegate>> eventMap = new HashMap<Class<? extends IEvent>, HashSet<IEventDelegate>>();
-	private HashMap<IEventHandler, HashSet<IEventDelegate>> handlerMap = new HashMap<IEventHandler, HashSet<IEventDelegate>>();
+	private HashMap<IEventHandler, HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>>> handlerMap = new HashMap<IEventHandler, HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>>>();
 
 	@Override
 	public void register(IEventHandler handler) {
@@ -34,14 +33,16 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 		if (handler == null) {
 			throw new IllegalArgumentException("The handler parameter cannot be null.");
 		}
-		
-		if (this.handlerMap.get(handler) != null) {
-			ArrayList<IEventDelegate> clone = new ArrayList<IEventDelegate>(this.handlerMap.get(handler));
-			for (IEventDelegate delegate : clone) {
-				delegate.kill();
-			}
-			this.handlerMap.remove(handler);
-		}
+
+		// FIXME: this no longer makes sense
+		// if (this.handlerMap.get(handler) != null) {
+		// ArrayList<IEventDelegate> clone = new
+		// ArrayList<IEventDelegate>(this.handlerMap.get(handler));
+		// for (IEventDelegate delegate : clone) {
+		// delegate.kill();
+		// }
+		// this.handlerMap.remove(handler);
+		// }
 	}
 
 	@Override
@@ -59,25 +60,33 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 	}
 
 	@Override
-	public Collection<IEventDelegate> find(Collection<IEventHandler> handlers) {
+	public Collection<IEventDelegate> find(Class<? extends IEvent> eventClass, Collection<IEventHandler> handlers) {
+		if (eventClass == null) {
+			throw new IllegalArgumentException("The eventClass parameter cannot be null.");
+		}
 		if (handlers == null) {
 			throw new IllegalArgumentException("The handlers parameter cannot be null.");
 		}
-		// Get the delegates for each handler, and throw them into a list of all the delegates
-		ArrayList<IEventDelegate> allDelegates = new ArrayList<IEventDelegate>();
+		// Get the delegates for each handler, and throw them into a list of all
+		// the delegates
+		HashSet<IEventDelegate> allDelegates = new HashSet<IEventDelegate>();
+		HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>> delegateMap = null;
+		ArrayList<IEventDelegate> delegates = null;
 		for (IEventHandler handler : handlers) {
 			if (handler != null) {
-				Collection<IEventDelegate> delegates = this.handlerMap.get(handler);
-				if (delegates != null) {
-					allDelegates.addAll(delegates);
+				delegateMap = this.handlerMap.get(handler);
+				if (delegateMap != null) {
+					delegates = delegateMap.get(eventClass);
+					if (delegates != null) {
+						allDelegates.addAll(delegates);
+					}
 				}
 			}
 		}
-		
+
 		return allDelegates;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void processHandler(IEventHandler handler) {
 		Method[] methods = handler.getClass().getMethods();
 		EventListener listenerAnnotation = null;
@@ -94,46 +103,22 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 									+ ". Methods listenering for events must have either the event they are listening for as a method parameter or no parameters at all. Also, listener methods must be publicly accessible.");
 				} else {
 					// Is a valid listener method
-					Class<? extends IEvent> targetClass = eventType;
-					EventDelegate newDelegate = null;
-					HashSet<IEventDelegate> delegates = null;
-					while (targetClass != null) {
-						// Do not consider event type if it is excluded
-						if (!exclusionSet.contains(targetClass)) {
-							newDelegate = new EventDelegate(method, handler, targetClass);
-							// Get or create the set of delegates for this
-							// target event type
-							delegates = this.eventMap.get(targetClass);
-							if (delegates == null) {
-								delegates = new HashSet<IEventDelegate>();
-								this.eventMap.put(targetClass, delegates);
-							}
-							// Add new delegate to if it doesn't already exist
-							if (!delegates.contains(newDelegate)) {
-								newDelegate.addOwner(delegates);
-								delegates.add(newDelegate);
-							}
-
-							// Get or create the set of delegates for this
-							// target handler instance
-							delegates = this.handlerMap.get(handler);
-							if (delegates == null) {
-								delegates = new HashSet<IEventDelegate>();
-								this.handlerMap.put(handler, delegates);
-							}
-							// Add new delegate to if it doesn't already exist
-							if (!delegates.contains(newDelegate)) {
-								newDelegate.addOwner(delegates);
-								delegates.add(newDelegate);
-							}
-						}
-
-						// Iterate to next applicable event type
-						if (IEvent.class.isAssignableFrom(targetClass.getSuperclass()) && !IEvent.class.equals(targetClass.getSuperclass())) {
-							targetClass = (Class<? extends IEvent>) targetClass.getSuperclass();
-						} else {
-							targetClass = null;
-						}
+					// Get delegates, the delegate for the most super event type
+					// is the last and the first is of the least super
+					ArrayList<EventDelegate> newDelegates = createDelegates(eventType, exclusionSet, handler, method);
+					// Taking care of the event map
+					EventDelegate currentDelegate = null;
+					while (newDelegates.size() > 0) {
+						currentDelegate = newDelegates.get(0);
+						// Register event delegates - keeping event inheritance
+						// in mind
+						addToEventMap(currentDelegate.getEventType(), newDelegates);
+						// Register handler specific delegates - keeping event
+						// inheritance in mind
+						addToHandlerMap(handler, currentDelegate.getEventType(), newDelegates);
+						// Remove the current delegate and move up to the
+						// delegate of its event type's super (if it exists)
+						newDelegates.remove(0);
 					}
 				}
 			}
@@ -165,4 +150,50 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 		return excludesSet;
 	}
 
+	@SuppressWarnings("unchecked")
+	private ArrayList<EventDelegate> createDelegates(Class<? extends IEvent> eventType, Collection<Class<? extends IEvent>> exclusionSet, IEventHandler handler, Method method) {
+		ArrayList<EventDelegate> newDelegates = new ArrayList<EventDelegate>();
+		Class<?> targetClass = eventType;
+		while (IEvent.class.isAssignableFrom(targetClass)) {
+			if (!exclusionSet.contains(targetClass)) {
+				newDelegates.add(new EventDelegate(method, handler, (Class<? extends IEvent>) targetClass));
+			}
+
+			targetClass = targetClass.getSuperclass();
+		}
+
+		return newDelegates;
+	}
+
+	private void addToEventMap(Class<? extends IEvent> eventType, Collection<EventDelegate> delegates) {
+		HashSet<IEventDelegate> delegateSet = this.eventMap.get(eventType);
+		if (delegateSet == null) {
+			delegateSet = new HashSet<IEventDelegate>();
+			this.eventMap.put(eventType, delegateSet);
+		}
+
+		for (EventDelegate delegate : delegates) {
+			delegateSet.add(delegate);
+			delegate.addOwner(delegateSet);
+		}
+	}
+
+	private void addToHandlerMap(IEventHandler handler, Class<? extends IEvent> eventType, Collection<EventDelegate> delegates) {
+		HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>> delegateMap = this.handlerMap.get(handler);
+		if (delegateMap == null) {
+			delegateMap = new HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>>();
+			this.handlerMap.put(handler, delegateMap);
+		}
+
+		ArrayList<IEventDelegate> delegateList = delegateMap.get(eventType);
+		if (delegateList == null) {
+			delegateList = new ArrayList<IEventDelegate>();
+			delegateMap.put(eventType, delegateList);
+		}
+
+		for (EventDelegate delegate : delegates) {
+			delegateList.add(delegate);
+			delegate.addOwner(delegateList);
+		}
+	}
 }
