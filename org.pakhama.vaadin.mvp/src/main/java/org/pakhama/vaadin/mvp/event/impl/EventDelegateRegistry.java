@@ -34,15 +34,18 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 			throw new IllegalArgumentException("The handler parameter cannot be null.");
 		}
 
-		// FIXME: this no longer makes sense
-		// if (this.handlerMap.get(handler) != null) {
-		// ArrayList<IEventDelegate> clone = new
-		// ArrayList<IEventDelegate>(this.handlerMap.get(handler));
-		// for (IEventDelegate delegate : clone) {
-		// delegate.kill();
-		// }
-		// this.handlerMap.remove(handler);
-		// }
+		HashMap<Class<? extends IEvent>, ArrayList<IEventDelegate>> delegateMap = this.handlerMap.get(handler);
+		if (delegateMap != null) {
+			for (Class<? extends IEvent> key : delegateMap.keySet()) {
+				ArrayList<IEventDelegate> delegateList = delegateMap.get(key);
+				if (delegateList != null) {
+					while (delegateList.size() > 0) {
+						delegateList.get(0).kill();
+					}
+				}
+			}
+			delegateMap.remove(handler);
+		}
 	}
 
 	@Override
