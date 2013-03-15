@@ -95,6 +95,7 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 	@Override
 	public int hashCode() {
 		int result = 119 + getClass().getName().hashCode();
+		result = (31 * result);
 		if (view != null) {
 			result += view.hashCode();
 		}
@@ -109,5 +110,17 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 		result = (31 * result);
 		
 		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		} 
+		if (!(obj instanceof Presenter)) {
+			return false;
+		}
+		
+		return obj.hashCode() == hashCode();
 	}
 }

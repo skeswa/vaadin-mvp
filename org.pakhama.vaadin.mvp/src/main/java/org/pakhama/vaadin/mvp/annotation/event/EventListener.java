@@ -1,4 +1,4 @@
-package org.pakhama.vaadin.mvp.annotation;
+package org.pakhama.vaadin.mvp.annotation.event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

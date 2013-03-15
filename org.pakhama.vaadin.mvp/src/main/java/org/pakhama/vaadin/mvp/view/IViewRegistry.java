@@ -1,6 +1,8 @@
 package org.pakhama.vaadin.mvp.view;
 
-public interface IViewRegistry {
+import java.io.Serializable;
+
+public interface IViewRegistry extends Serializable {
 	void register(Class<? extends IView> viewImplClass);
 	void unregister(Class<? extends IView> viewImplClass);
 	void clear();

@@ -1,11 +1,11 @@
 package org.pakhama.vaadin.mvp.exception;
 
-public class EventRegistrationException extends RuntimeException {
+public class EventListenerRegistrationException extends RuntimeException {
 	private static final long serialVersionUID = 2156404674525470854L;
 
 	private String message;
 	
-	public EventRegistrationException(String message) {
+	public EventListenerRegistrationException(String message) {
 		this.message = message;
 	}
 	

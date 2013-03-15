@@ -9,7 +9,7 @@ public interface IPresenterRegistry extends Serializable {
 	void register(IPresenter<? extends IView> presenter, IPresenter<? extends IView> parent, IView view);
 	void unregister(IPresenter<? extends IView> presenter);
 	
-	IView find(IPresenter<? extends IView> presenter);
+	IPresenter<? extends IView> find(IView view);
 	
 	IPresenter<? extends IView> parentOf(IPresenter<? extends IView> presenter);
 	Collection<IPresenter<? extends IView>> siblingsOf(IPresenter<? extends IView> presenter);

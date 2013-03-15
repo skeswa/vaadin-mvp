@@ -7,6 +7,8 @@ import org.pakhama.vaadin.mvp.view.IView;
 import org.pakhama.vaadin.mvp.view.IViewRegistry;
 
 public class ViewRegistry implements IViewRegistry {
+	private static final long serialVersionUID = -3658969717696659192L;
+	
 	private HashMap<Class<? extends IView>, Class<? extends IView>> viewCache = new HashMap<Class<? extends IView>, Class<? extends IView>>();
 
 	@Override
@@ -47,5 +49,13 @@ public class ViewRegistry implements IViewRegistry {
 	@Override
 	public void clear() {
 		this.viewCache.clear();
+	}
+
+	@Override
+	public Class<? extends IView> find(Class<? extends IView> viewClass) {
+		if (viewClass == null) {
+			throw new IllegalArgumentException("The viewClass parameter was null.");
+		}
+		return this.viewCache.get(viewClass);
 	}
 }
