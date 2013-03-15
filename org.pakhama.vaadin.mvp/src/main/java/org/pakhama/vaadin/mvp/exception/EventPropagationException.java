@@ -9,6 +9,11 @@ public class EventPropagationException extends RuntimeException {
 		this.message = message;
 	}
 	
+	public EventPropagationException(String message, Throwable cause) {
+		initCause(cause);
+		this.message = message;
+	}
+	
 	@Override
 	public String getMessage() {
 		return this.message;
