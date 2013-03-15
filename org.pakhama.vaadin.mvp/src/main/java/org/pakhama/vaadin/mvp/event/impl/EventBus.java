@@ -64,7 +64,7 @@ public class EventBus implements IEventBus {
 			if (dispatcher instanceof IPresenter<?>) {
 				Collection<IPresenter<?>> children = this.presenterRegistry.childrenOf((IPresenter<?>) dispatcher);
 				if (children != null) {
-					delegates = this.delegateRegistry.find(new ArrayList<IEventHandler>(children));
+					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(children));
 				}
 			} else {
 				throw new EventPropagationException("EventScope.CHILDREN is only applicable for event handlers of type IPresenter.");
@@ -75,7 +75,7 @@ public class EventBus implements IEventBus {
 			if (dispatcher instanceof IPresenter<?>) {
 				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) dispatcher);
 				if (siblings != null) {
-					delegates = this.delegateRegistry.find(new ArrayList<IEventHandler>(siblings));
+					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(siblings));
 				}
 			} else {
 				throw new EventPropagationException("EventScope.SIBLINGS is only applicable for event handlers of type IPresenter.");
@@ -87,13 +87,13 @@ public class EventBus implements IEventBus {
 			if (dispatcher instanceof IPresenter<?>) {
 				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) dispatcher);
 				if (siblings != null) {
-					delegates = this.delegateRegistry.find(new ArrayList<IEventHandler>(siblings));
+					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(siblings));
 				}
 			} else if (dispatcher instanceof IView) {
 				IPresenter<?> parent = this.presenterRegistry.find((IView) dispatcher);
 				if (parent != null) {
 					LinkedList<IEventHandler> parentWrapper = new LinkedList<IEventHandler>();
-					delegates = this.delegateRegistry.find(parentWrapper);
+					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
 				}
 			} else {
 				throw new EventPropagationException("EventScope.SIBLINGS is only applicable for event handlers of type IPresenter.");
