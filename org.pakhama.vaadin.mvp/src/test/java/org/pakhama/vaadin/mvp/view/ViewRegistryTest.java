@@ -10,7 +10,6 @@ import org.pakhama.vaadin.mvp.view.one.AnotherOneView;
 import org.pakhama.vaadin.mvp.view.one.IOneView;
 import org.pakhama.vaadin.mvp.view.one.OneView;
 import org.pakhama.vaadin.mvp.view.one.YetAnotherOneView;
-import org.pakhama.vaadin.mvp.view.two.TwoView;
 import org.pakhama.vaadin.mvp.view.two.TwoViewImpl;
 
 public class ViewRegistryTest {
@@ -60,7 +59,7 @@ public class ViewRegistryTest {
 		IViewRegistry registry = new ViewRegistry();
 		registry.register(OneView.class);
 		registry.register(OneView.class);
-		registry.register(TwoView.class);
+		registry.register(TwoViewImpl.class);
 		registry.register(AnotherOneView.class);
 		Collection<Class<? extends IView>> result = registry.findAll(IOneView.class);
 		Assert.assertTrue(result.size() == 2);
@@ -83,7 +82,7 @@ public class ViewRegistryTest {
 
 			@Override
 			public boolean prioritize(Class<? extends IView> first, Class<? extends IView> second) {
-				return first.getName().compareTo(second.getName()) <= 0;
+				return first.getName().compareTo(second.getName()) > 0;
 			}
 		};
 		Class<? extends IView> result = registry.find(IOneView.class, alphabeticalPrioritizer);
