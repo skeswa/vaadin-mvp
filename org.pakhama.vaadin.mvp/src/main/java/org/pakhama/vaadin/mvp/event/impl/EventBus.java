@@ -117,7 +117,7 @@ public class EventBus implements IEventBus {
 	}
 	
 	private void invokeDelegate(IEventDelegate delegate) {
-		// TODO:
+		// TODO: implement this or else
 	}
 
 	private void injectField(Class<? extends Annotation> annotationType, Object instance, Object fieldValue) {
