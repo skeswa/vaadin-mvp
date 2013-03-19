@@ -37,8 +37,8 @@ public class ViewFactory implements IViewFactory {
 				// The view implementation doesn't have an obvious name
 				throw new ViewConstructionException(
 						"Could not identify an implementation for view class "
-								+ viewClass
-								+ ". Either register the view implementation in the IViewRegistry, or name you view implementation predictably and put it in the same package as the view class. For instance, IDummyView would be implemented by either DummyView or DummyViewImpl; DummyView would be implelemented by DummyViewImpl.");
+								+ viewClass.getName()
+								+ ". Either register the view implementation in the IViewRegistry, or name you view implementation predictably and put it in the same package as the view class. For instance, IDummyView would be implemented by either DummyView or DummyViewImpl; DummyView would be implemented by DummyViewImpl.");
 			} else {
 				this.registry.register(viewImplClass);
 			}

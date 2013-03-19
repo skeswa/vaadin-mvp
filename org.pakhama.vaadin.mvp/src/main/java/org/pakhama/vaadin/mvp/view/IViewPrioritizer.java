@@ -1,5 +1,7 @@
 package org.pakhama.vaadin.mvp.view;
 
+import java.io.Serializable;
+
 /**
  * A utility interface employed by the {@link IViewRegistry} to prioritize a
  * particular view implementation, in a collection of view implementations, to
@@ -8,7 +10,7 @@ package org.pakhama.vaadin.mvp.view;
  * @author Sandile
  * 
  */
-public interface IViewPrioritizer {
+public interface IViewPrioritizer extends Serializable {
 	/**
 	 * This method determines whether the <code>first</code> parameter is more
 	 * preferred than the <code>second</code> parameter. <code>true</code>

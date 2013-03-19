@@ -5,6 +5,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ ViewRegistryTest.class })
+@SuiteClasses({ ViewRegistryTest.class, ViewFactoryTest.class })
 public class ViewTestSuite {
 }

@@ -72,6 +72,7 @@ public class ViewRegistryTest {
 		registry.register(AnotherOneView.class);
 		registry.register(YetAnotherOneView.class);
 		IViewPrioritizer alphabeticalPrioritizer = new IViewPrioritizer() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public boolean prioritize(Class<? extends IView> first, Class<? extends IView> second) {
@@ -79,6 +80,7 @@ public class ViewRegistryTest {
 			}
 		};
 		IViewPrioritizer oppositeAlphabeticalPrioritizer = new IViewPrioritizer() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public boolean prioritize(Class<? extends IView> first, Class<? extends IView> second) {

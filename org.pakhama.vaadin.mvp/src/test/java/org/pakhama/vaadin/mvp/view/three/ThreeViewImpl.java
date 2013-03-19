@@ -5,7 +5,7 @@ import org.pakhama.vaadin.mvp.event.IEvent;
 
 import com.vaadin.ui.Component;
 
-public class ThreeViewImpl implements IThreeView {
+public class ThreeViewImpl implements ThreeView {
 	private static final long serialVersionUID = 1L;
 
 	@Override

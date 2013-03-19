@@ -85,6 +85,14 @@ public class ViewRegistry implements IViewRegistry {
 
 	@Override
 	public void clear() {
+		for (Class<? extends IView> key : this.viewCache.keySet()) {
+			if (key != null) {
+				ArrayList<Class<? extends IView>> entry = this.viewCache.get(key);
+				if (entry != null) {
+					entry.clear();
+				}
+			}
+		}
 		this.viewCache.clear();
 	}
 

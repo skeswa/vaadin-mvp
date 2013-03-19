@@ -1,12 +1,12 @@
-package org.pakhama.vaadin.mvp.view.four;
+package org.pakhama.vaadin.mvp.view.four.view;
 
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
-import org.pakhama.vaadin.mvp.view.three.IThreeView;
+import org.pakhama.vaadin.mvp.view.four.IFourView;
 
 import com.vaadin.ui.Component;
 
-public class FourView implements IThreeView {
+public class FourView implements IFourView {
 	private static final long serialVersionUID = 1L;
 
 	@Override
