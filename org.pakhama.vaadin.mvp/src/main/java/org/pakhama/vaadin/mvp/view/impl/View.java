@@ -1,6 +1,6 @@
 package org.pakhama.vaadin.mvp.view.impl;
 
-import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
+import org.pakhama.vaadin.mvp.annotation.field.EventBus;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
@@ -12,7 +12,7 @@ import com.vaadin.ui.VerticalLayout;
 public class View extends VerticalLayout implements IView {
 	private static final long serialVersionUID = 5552315123806395809L;
 
-	@EventBusField
+	@EventBus
 	private IEventBus eventBus;
 
 	@Override

@@ -1,12 +1,10 @@
 package org.pakhama.vaadin.mvp.event.impl;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.pakhama.vaadin.mvp.annotation.field.EventDispatcherField;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
@@ -14,8 +12,8 @@ import org.pakhama.vaadin.mvp.event.IEventDelegate;
 import org.pakhama.vaadin.mvp.event.IEventDelegateRegistry;
 import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
+import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
 import org.pakhama.vaadin.mvp.exception.EventPropagationException;
-import org.pakhama.vaadin.mvp.exception.FieldInjectionException;
 import org.pakhama.vaadin.mvp.presenter.IPresenter;
 import org.pakhama.vaadin.mvp.presenter.IPresenterRegistry;
 import org.pakhama.vaadin.mvp.view.IView;
@@ -50,14 +48,10 @@ public class EventBus implements IEventBus {
 			throw new IllegalArgumentException("The registry parameter cannot be null.");
 		}
 
-		try {
-			injectField(EventDispatcherField.class, event, dispatcher);
-		} catch (FieldInjectionException e) {
-			// It is the developer's fault if the dispatcher field of the event
-			// cannot be injected
-		}
-
 		Collection<IEventDelegate> delegates = null;
+		// Set the source of the event
+		event.setSource(dispatcher);
+		// Choose propagation strategy
 		switch (scope) {
 		case CHILDREN:
 			// This scope is only applicable for dispatchers of type IPresenter
@@ -103,10 +97,23 @@ public class EventBus implements IEventBus {
 			delegates = this.delegateRegistry.find(event.getClass());
 			break;
 		}
-		
+
 		if (delegates != null) {
+			EventListenerInvocationException ex = new EventListenerInvocationException("There were event handlers that were not invoked. ", new ArrayList<Throwable>());
 			for (IEventDelegate delegate : delegates) {
-				invokeDelegate(delegate);
+				try {
+					invokeDelegate(delegate, event);
+				} catch (IllegalArgumentException e) {
+					ex.getCauses().add(e);
+				} catch (IllegalAccessException e) {
+					ex.getCauses().add(e);
+				} catch (InvocationTargetException e) {
+					ex.getCauses().add(e);
+				}
+			}
+			
+			if (ex.getCauses().size() != 0) {
+				throw ex;
 			}
 		}
 	}
@@ -115,45 +122,14 @@ public class EventBus implements IEventBus {
 	public IEventDelegateRegistry getRegistry() {
 		return this.getRegistry();
 	}
-	
-	private void invokeDelegate(IEventDelegate delegate) {
-		// TODO: implement this or else
+
+	private void invokeDelegate(IEventDelegate delegate, IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		if (delegate.getMethod().getParameterTypes().length == 0) {
+			delegate.getMethod().invoke(delegate.getHandler());
+		} else if (delegate.getMethod().getParameterTypes().length == 1) {
+			delegate.getMethod().invoke(delegate.getHandler(), event);
+		} else {
+			throw new IllegalArgumentException("The event handler method " + delegate.getMethod() + " had more than one argument. Event handler methods must specify either no arguments, or one argument which shares the event of its @EventListener annotation.");
+		}
 	}
-
-	private void injectField(Class<? extends Annotation> annotationType, Object instance, Object fieldValue) {
-		if (annotationType == null) {
-			throw new IllegalArgumentException("The annotationType parameter cannot be null.");
-		}
-		if (instance == null) {
-			throw new IllegalArgumentException("The instance parameter cannot be null.");
-		}
-		if (fieldValue == null) {
-			throw new IllegalArgumentException("The fieldValue parameter cannot be null.");
-		}
-
-		Class<?> targetClass = instance.getClass();
-		while (!Object.class.equals(targetClass)) {
-			Field[] fields = targetClass.getDeclaredFields();
-			for (Field field : fields) {
-				if (field.getAnnotation(annotationType) != null) {
-					try {
-						field.setAccessible(true);
-						field.set(instance, fieldValue);
-					} catch (SecurityException e) {
-						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The field was inaccessible.", e);
-					} catch (IllegalArgumentException e) {
-						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The intended field value was incompatible with the field.",
-								e);
-					} catch (IllegalAccessException e) {
-						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The field was inaccessible.", e);
-					}
-				}
-			}
-			targetClass = targetClass.getSuperclass();
-		}
-
-		throw new FieldInjectionException("No field in the class " + instance.getClass() + " was marked with the " + annotationType
-				+ " annotation. A field with this annotation is a requirement for injection to be successful.");
-	}
-
 }

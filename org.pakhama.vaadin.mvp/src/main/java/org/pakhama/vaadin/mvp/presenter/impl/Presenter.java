@@ -1,7 +1,7 @@
 package org.pakhama.vaadin.mvp.presenter.impl;
 
-import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
-import org.pakhama.vaadin.mvp.annotation.field.PresenterFactoryField;
+import org.pakhama.vaadin.mvp.annotation.field.EventBus;
+import org.pakhama.vaadin.mvp.annotation.field.Factory;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
@@ -13,9 +13,9 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 	private static final long serialVersionUID = 5131211825391491296L;
 
 	private T view;
-	@EventBusField
+	@EventBus
 	private IEventBus eventBus;
-	@PresenterFactoryField
+	@Factory
 	private IPresenterFactory factory;
 
 	@Override
@@ -101,36 +101,5 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			// Doesn't matter if finalize failed
 		}
 	}
-
-	@Override
-	public int hashCode() {
-		int result = 119 + getClass().getName().hashCode();
-		result = (31 * result);
-		if (view != null) {
-			result += view.hashCode();
-		}
-		result = (31 * result);
-		if (eventBus != null) {
-			result += eventBus.hashCode();
-		}
-		result = (31 * result);
-		if (factory != null) {
-			result += factory.hashCode();
-		}
-		result = (31 * result);
-
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Presenter)) {
-			return false;
-		}
-
-		return obj.hashCode() == hashCode();
-	}
+	
 }

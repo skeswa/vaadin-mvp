@@ -15,14 +15,15 @@ class PresenterRegistryTree {
 		PresenterRegistryNode node = this.nodeCache.get(presenter);
 		if (node == null) {
 			node = new PresenterRegistryNode(presenter);
+			this.nodeCache.put(presenter, node);
 			if (parent != null) {
 				PresenterRegistryNode parentNode = this.nodeCache.get(parent);
 				if (parentNode == null) {
 					parentNode = new PresenterRegistryNode(parent);
+					this.nodeCache.put(parent, parentNode);
 				}
 				parentNode.addChild(node);
 			}
-			this.nodeCache.put(presenter, node);
 		}
 	}
 	
@@ -31,6 +32,7 @@ class PresenterRegistryTree {
 		if (node == null) {
 			return;
 		} else {
+			// Orphan the children, disown the parent
 			node.kill();
 			this.nodeCache.remove(presenter);
 		}

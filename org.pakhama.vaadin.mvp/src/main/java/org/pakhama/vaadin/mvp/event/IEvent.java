@@ -4,4 +4,5 @@ import java.io.Serializable;
 
 public interface IEvent extends Serializable {
 	IEventDispatcher getSource();
+	void setSource(IEventDispatcher source);
 }

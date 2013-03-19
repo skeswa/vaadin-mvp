@@ -13,6 +13,7 @@ public class PresenterRegistry implements IPresenterRegistry {
 	private PresenterRegistryTree presenterCache = new PresenterRegistryTree();
 	private HashMap<IView, IPresenter<? extends IView>> viewPresenterMap = new HashMap<IView, IPresenter<? extends IView>>();
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void register(IPresenter<? extends IView> presenter, IPresenter<? extends IView> parent, IView view) {
 		if (presenter == null) {
@@ -24,6 +25,10 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		this.presenterCache.add(presenter, parent);
 		this.viewPresenterMap.put(view, presenter);
+
+		// Welcome the new presenter with open arms, then whisper into its ear
+		// that its days are numbered
+		((IPresenter<IView>) presenter).onBind(view);
 	}
 
 	@Override
@@ -31,19 +36,22 @@ public class PresenterRegistry implements IPresenterRegistry {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter was null.");
 		}
-
+		// Erase any evidence that the presenter was referenced here
 		this.presenterCache.remove(presenter);
-		if (presenter.getView() == null) {
+		if (presenter.getView() != null) {
 			this.viewPresenterMap.remove(presenter.getView());
 		}
+		// Let the presenter in on its own death,
+		// Don't hold it a funeral
+		presenter.onUnbind();
 	}
 
 	@Override
-	public IPresenter<? extends IView> find(IView view){
+	public IPresenter<? extends IView> find(IView view) {
 		if (view == null) {
 			throw new IllegalArgumentException("The view parameter was null.");
 		}
-		
+
 		return this.viewPresenterMap.get(view);
 	}
 
@@ -52,7 +60,7 @@ public class PresenterRegistry implements IPresenterRegistry {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter was null.");
 		}
-		
+
 		return this.presenterCache.parentOf(presenter);
 	}
 
@@ -61,7 +69,7 @@ public class PresenterRegistry implements IPresenterRegistry {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter was null.");
 		}
-		
+
 		return this.presenterCache.siblingsOf(presenter);
 	}
 
@@ -70,8 +78,13 @@ public class PresenterRegistry implements IPresenterRegistry {
 		if (presenter == null) {
 			throw new IllegalArgumentException("The presenter parameter was null.");
 		}
-		
+
 		return this.presenterCache.childrenOf(presenter);
+	}
+
+	@Override
+	public int size() {
+		return this.viewPresenterMap.entrySet().size();
 	}
 
 }

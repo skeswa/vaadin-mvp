@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
-import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
-import org.pakhama.vaadin.mvp.annotation.field.PresenterFactoryField;
+import org.pakhama.vaadin.mvp.annotation.field.EventBus;
+import org.pakhama.vaadin.mvp.annotation.field.Factory;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.FieldInjectionException;
 import org.pakhama.vaadin.mvp.exception.InaccessiblePresenterException;
@@ -76,25 +76,21 @@ public class PresenterFactory implements IPresenterFactory {
 		}
 		// Attempt to inject the event bus into the view instance
 		try {
-			injectField(EventBusField.class, viewInstance, this.eventBus);
+			injectField(EventBus.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
 			// Swallow the exception, its ok if they don't have the event bus
 			// field
 		}
 		// Attempt to inject the presenter factory into the view instance
 		try {
-			injectField(PresenterFactoryField.class, viewInstance, this);
+			injectField(Factory.class, viewInstance, this);
 		} catch (FieldInjectionException e) {
 			// Swallow the exception, its ok if they don't have the presenter
 			// factory field
 		}
 		// Register the presenter-view pair to the proper registries
-		this.presenterRegistry.register(presenterInstance, null, viewInstance);
 		this.eventBus.getRegistry().register(presenterInstance);
-		// Fire the initialization methods to begin the life cycle of the
-		// respective view and presenter
-		viewInstance.onBind();
-		((IPresenter<IView>) presenterInstance).onBind(viewInstance);
+		this.presenterRegistry.register(presenterInstance, null, viewInstance);
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}
@@ -133,14 +129,14 @@ public class PresenterFactory implements IPresenterFactory {
 		}
 		// Attempt to inject the event bus into the view instance
 		try {
-			injectField(EventBusField.class, viewInstance, this.eventBus);
+			injectField(EventBus.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
 			// Swallow the exception, its ok if they don't have the event bus
 			// field
 		}
 		// Attempt to inject the presenter factory into the view instance
 		try {
-			injectField(PresenterFactoryField.class, viewInstance, this);
+			injectField(Factory.class, viewInstance, this);
 		} catch (FieldInjectionException e) {
 			// Swallow the exception, its ok if they don't have the presenter
 			// factory field

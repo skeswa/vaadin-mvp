@@ -15,7 +15,7 @@ public class EventListenerInvocationException extends RuntimeException {
 	
 	@Override
 	public String getMessage() {
-		return message;
+		return message + ":" + this.causes;
 	}
 	
 	public Collection<Throwable> getCauses() {

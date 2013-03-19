@@ -1,9 +1,12 @@
 package org.pakhama.vaadin.mvp.view;
 
+import org.pakhama.vaadin.mvp.annotation.field.EventBus;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
+import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 import org.pakhama.vaadin.mvp.presenter.IPresenter;
+import org.pakhama.vaadin.mvp.presenter.IPresenterRegistry;
 
 import com.vaadin.ui.Component;
 
@@ -20,7 +23,21 @@ import com.vaadin.ui.Component;
  * {@link EventScope#PARENT} scope. In practice, the {@link IView} interface is
  * <b>intended for extension</b>, and should not be implemented naked.
  * Implementations of the {@link IView} interface <i>must implement a default
- * constructor</i>.
+ * constructor</i>.<br>
+ * </br>In custom implementations of {@link IView} types, for the
+ * {@link IViewFactory} to wire in the {@link IEventBus}, a field with the
+ * {@link EventBus} annotation must exist. For example,
+ * 
+ * <pre>
+ * <code>{@literal @}EventBus
+ * private IEventBus eventBus;</code>
+ * </pre>
+ * 
+ * This field is not required, but without it, implementation of event
+ * dispatching becomes difficult. Also, in custom implementations, it is very
+ * important that the {@link IView#onUnbind()} method is implemented correctly -
+ * this is essential to the memory deallocation progress initiated by the
+ * {@link IPresenterRegistry#unregister(IPresenter)} method.</br>
  * 
  * @author Sandile
  * 
