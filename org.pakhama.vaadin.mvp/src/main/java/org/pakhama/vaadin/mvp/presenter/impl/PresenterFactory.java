@@ -78,15 +78,22 @@ public class PresenterFactory implements IPresenterFactory {
 		try {
 			injectField(EventBus.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			// Swallow the exception, its ok if they don't have the event bus
-			// field
+			// Swallow the exception, its ok if the view doesn't have the event
+			// bus field marked by @EventBus
 		}
-		// Attempt to inject the presenter factory into the view instance
+		// Attempt to inject the event bus into the presenter instance
 		try {
-			injectField(Factory.class, viewInstance, this);
+			injectField(EventBus.class, presenterInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			// Swallow the exception, its ok if they don't have the presenter
-			// factory field
+			// Swallow the exception, its ok if the presenter doesn't have the
+			// event bus field marked by @EventBus
+		}
+		// Attempt to inject the presenter factory into the presenter instance
+		try {
+			injectField(Factory.class, presenterInstance, this);
+		} catch (FieldInjectionException e) {
+			// Swallow the exception, its ok if the presenter doesn't have the
+			// presenter factory field marked by @Factory
 		}
 		// Register the presenter-view pair to the proper registries
 		this.eventBus.getRegistry().register(presenterInstance);
@@ -131,15 +138,22 @@ public class PresenterFactory implements IPresenterFactory {
 		try {
 			injectField(EventBus.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			// Swallow the exception, its ok if they don't have the event bus
-			// field
+			// Swallow the exception, its ok if the view doesn't have the event
+			// bus field marked by @EventBus
 		}
-		// Attempt to inject the presenter factory into the view instance
+		// Attempt to inject the event bus into the presenter instance
 		try {
-			injectField(Factory.class, viewInstance, this);
+			injectField(EventBus.class, presenterInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			// Swallow the exception, its ok if they don't have the presenter
-			// factory field
+			// Swallow the exception, its ok if the presenter doesn't have the
+			// event bus field marked by @EventBus
+		}
+		// Attempt to inject the presenter factory into the presenter instance
+		try {
+			injectField(Factory.class, presenterInstance, this);
+		} catch (FieldInjectionException e) {
+			// Swallow the exception, its ok if the presenter doesn't have the
+			// presenter factory field marked by @Factory
 		}
 		// Register the presenter-view pair to the presenter registry
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);

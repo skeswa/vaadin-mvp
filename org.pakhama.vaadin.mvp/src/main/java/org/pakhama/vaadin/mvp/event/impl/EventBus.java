@@ -120,7 +120,7 @@ public class EventBus implements IEventBus {
 
 	@Override
 	public IEventDelegateRegistry getRegistry() {
-		return this.getRegistry();
+		return this.delegateRegistry;
 	}
 
 	private void invokeDelegate(IEventDelegate delegate, IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
