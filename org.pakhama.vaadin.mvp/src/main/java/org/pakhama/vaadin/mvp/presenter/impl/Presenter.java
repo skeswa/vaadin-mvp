@@ -2,7 +2,6 @@ package org.pakhama.vaadin.mvp.presenter.impl;
 
 import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
 import org.pakhama.vaadin.mvp.annotation.field.PresenterFactoryField;
-import org.pakhama.vaadin.mvp.annotation.field.ViewField;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
@@ -13,7 +12,6 @@ import org.pakhama.vaadin.mvp.view.IView;
 public class Presenter<T extends IView> implements IPresenter<T> {
 	private static final long serialVersionUID = 5131211825391491296L;
 
-	@ViewField
 	private T view;
 	@EventBusField
 	private IEventBus eventBus;
@@ -66,7 +64,7 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 
 		this.eventBus.propagate(event, this, scope);
 	}
-	
+
 	@Override
 	public <E extends IPresenter<? extends IView>> E createChild(Class<E> presenterClass) {
 		E child = this.factory.create(presenterClass, this);
@@ -74,24 +72,36 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 	}
 
 	@Override
-	public void onBind() {
-		// Does nothing by default, intended to be overridden
+	public void onBind(T view) {
+		if (view == null) {
+			throw new IllegalArgumentException("The view parameter cannot be null.");
+		}
+		// Check that we don't have an existing view already
+		if (this.view != null) {
+			// We're killing our existing view and getting a new one >:-D
+			this.view.onUnbind();
+		}
+		// Bend the new view to this presenter
+		this.view = view;
+		this.view.onBind();
 	}
 
 	@Override
 	public void onUnbind() {
+		// Kill the view first
+		this.view.onUnbind();
+		// Get rid of instance variables
 		this.eventBus = null;
 		this.factory = null;
 		this.view = null;
-
+		// Request that this class be garbage collected
 		try {
 			finalize();
 		} catch (Throwable e) {
-			// Doesn't matter if finalize failed, just called to mark this class
-			// as garbage
+			// Doesn't matter if finalize failed
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int result = 119 + getClass().getName().hashCode();
@@ -108,19 +118,19 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			result += factory.hashCode();
 		}
 		result = (31 * result);
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
-		} 
+		}
 		if (!(obj instanceof Presenter)) {
 			return false;
 		}
-		
+
 		return obj.hashCode() == hashCode();
 	}
 }

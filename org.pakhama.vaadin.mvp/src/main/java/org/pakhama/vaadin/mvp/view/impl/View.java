@@ -15,10 +15,6 @@ public class View extends VerticalLayout implements IView {
 	@EventBusField
 	private IEventBus eventBus;
 
-	View() {
-		setSizeFull();
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -56,18 +52,20 @@ public class View extends VerticalLayout implements IView {
 	}
 
 	public void onBind() {
-		// Does nothing by default, intended to be overridden
+		// Does nothing by default; intended to be overridden
+		// Overriding this is intended to be optional
 	}
 
 	public void onUnbind() {
+		// Get rid of instance variables
 		this.eventBus = null;
+		// Suicide as Vaadin component
 		detach();
-
+		// Request that this class be garbage collected
 		try {
 			finalize();
 		} catch (Throwable e) {
-			// Doesn't matter if finalize failed, just called to mark this class
-			// as garbage
+			// Doesn't matter if finalize failed
 		}
 	}
 
@@ -75,7 +73,7 @@ public class View extends VerticalLayout implements IView {
 	public Component getComponent() {
 		return this;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int result = 277 + getClass().getName().hashCode();
@@ -86,19 +84,19 @@ public class View extends VerticalLayout implements IView {
 		result = (31 * result);
 		result += getComponentCount();
 		result = (31 * result);
-		
+
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
-		} 
+		}
 		if (!(obj instanceof View)) {
 			return false;
 		}
-		
+
 		return obj.hashCode() == hashCode();
 	}
 }

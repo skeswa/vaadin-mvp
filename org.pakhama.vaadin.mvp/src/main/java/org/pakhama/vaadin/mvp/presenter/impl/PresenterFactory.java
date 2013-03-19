@@ -5,9 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 
 import org.pakhama.vaadin.mvp.annotation.field.EventBusField;
-import org.pakhama.vaadin.mvp.annotation.field.ParentPresenterField;
 import org.pakhama.vaadin.mvp.annotation.field.PresenterFactoryField;
-import org.pakhama.vaadin.mvp.annotation.field.ViewField;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.exception.FieldInjectionException;
 import org.pakhama.vaadin.mvp.exception.InaccessiblePresenterException;
@@ -80,15 +78,15 @@ public class PresenterFactory implements IPresenterFactory {
 		try {
 			injectField(EventBusField.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			throw new ViewConstructionException("IView implementation " + viewClass
-					+ " could not have its required event bus field, annotated with @EventBusField, initialized.", e);
+			// Swallow the exception, its ok if they don't have the event bus
+			// field
 		}
-		// Attempt to inject the event bus, view implementation and presenter
-		// factory into the presenter instance
+		// Attempt to inject the presenter factory into the view instance
 		try {
-			injectPresenterFields(presenterInstance, viewInstance);
+			injectField(PresenterFactoryField.class, viewInstance, this);
 		} catch (FieldInjectionException e) {
-			throw new PresenterConstructionException("IPresenter implementation " + presenterClass + " could not have its required fields initialized.", e);
+			// Swallow the exception, its ok if they don't have the presenter
+			// factory field
 		}
 		// Register the presenter-view pair to the proper registries
 		this.presenterRegistry.register(presenterInstance, null, viewInstance);
@@ -96,11 +94,11 @@ public class PresenterFactory implements IPresenterFactory {
 		// Fire the initialization methods to begin the life cycle of the
 		// respective view and presenter
 		viewInstance.onBind();
-		presenterInstance.onBind();
+		((IPresenter<IView>) presenterInstance).onBind(viewInstance);
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends IPresenter<? extends IView>> T create(Class<T> presenterClass, IPresenter<? extends IView> parent) {
 		if (presenterClass == null) {
@@ -137,92 +135,24 @@ public class PresenterFactory implements IPresenterFactory {
 		try {
 			injectField(EventBusField.class, viewInstance, this.eventBus);
 		} catch (FieldInjectionException e) {
-			throw new ViewConstructionException("IView implementation " + viewClass
-					+ " could not have its required event bus field, annotated with @EventBusField, initialized.", e);
+			// Swallow the exception, its ok if they don't have the event bus
+			// field
 		}
-		// Attempt to inject the event bus, view implementation and presenter
-		// factory into the presenter instance
+		// Attempt to inject the presenter factory into the view instance
 		try {
-			injectPresenterFields(presenterInstance, viewInstance);
+			injectField(PresenterFactoryField.class, viewInstance, this);
 		} catch (FieldInjectionException e) {
-			throw new PresenterConstructionException("IPresenter implementation " + presenterClass + " could not have its required fields initialized.", e);
-		}
-		// Attempt to inject the parent presenter into the presenter instance
-		try {
-			injectField(ParentPresenterField.class, presenterInstance, parent);
-		} catch (FieldInjectionException e) {
-			throw new ViewConstructionException("IPresenter implementation " + presenterClass
-					+ " could not have its parent presenter field, annotated with @ParentPresenterField, initialized.", e);
+			// Swallow the exception, its ok if they don't have the presenter
+			// factory field
 		}
 		// Register the presenter-view pair to the presenter registry
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
 		// Fire the initialization methods to begin the life cycle of the
 		// respective view and presenter
 		viewInstance.onBind();
-		presenterInstance.onBind();
+		((IPresenter<IView>) presenterInstance).onBind(viewInstance);
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
-	}
-
-	private void injectPresenterFields(IPresenter<? extends IView> presenter, IView view) {
-		if (presenter == null) {
-			throw new IllegalArgumentException("The presenter parameter cannot be null.");
-		}
-
-		boolean viewFound = false, eventBusFound = false, factoryFound = false;
-
-		Class<?> targetClass = presenter.getClass();
-		while (!Object.class.equals(targetClass)) {
-			Field[] fields = targetClass.getDeclaredFields();
-			for (Field field : fields) {
-				if (field.getAnnotation(ViewField.class) != null) {
-					try {
-						field.setAccessible(true);
-						field.set(presenter, view);
-					} catch (SecurityException e) {
-						throw new FieldInjectionException("Could not inject " + view + " into " + field + ". The field was inaccessible.", e);
-					} catch (IllegalArgumentException e) {
-						throw new FieldInjectionException("Could not inject " + view + " into " + field + ". The intended field value was incompatible with the field.", e);
-					} catch (IllegalAccessException e) {
-						throw new FieldInjectionException("Could not inject " + view + " into " + field + ". The field was inaccessible.", e);
-					}
-					viewFound = true;
-				} else if (field.getAnnotation(EventBusField.class) != null) {
-					try {
-						field.setAccessible(true);
-						field.set(presenter, this.eventBus);
-					} catch (SecurityException e) {
-						throw new FieldInjectionException("Could not inject " + this.eventBus + " into " + field + ". The field was inaccessible.", e);
-					} catch (IllegalArgumentException e) {
-						throw new FieldInjectionException("Could not inject " + this.eventBus + " into " + field
-								+ ". The intended field value was incompatible with the field.", e);
-					} catch (IllegalAccessException e) {
-						throw new FieldInjectionException("Could not inject " + this.eventBus + " into " + field + ". The field was inaccessible.", e);
-					}
-					eventBusFound = true;
-				} else if (field.getAnnotation(PresenterFactoryField.class) != null) {
-					try {
-						field.setAccessible(true);
-						field.set(presenter, this);
-					} catch (SecurityException e) {
-						throw new FieldInjectionException("Could not inject " + this + " into " + field + ". The field was inaccessible.", e);
-					} catch (IllegalArgumentException e) {
-						throw new FieldInjectionException("Could not inject " + this + " into " + field + ". The intended field value was incompatible with the field.", e);
-					} catch (IllegalAccessException e) {
-						throw new FieldInjectionException("Could not inject " + this + " into " + field + ". The field was inaccessible.", e);
-					}
-					factoryFound = true;
-				}
-
-				if (viewFound && eventBusFound && factoryFound) {
-					return;
-				}
-			}
-			targetClass = targetClass.getSuperclass();
-		}
-
-		throw new FieldInjectionException(
-				"Three fields, each respectively marked with the @ViewField, @EventBusField and @PresenterFactoryField annotations, must exist in an IPresenter implementation for it to be successfully created by this factory.");
 	}
 
 	private void injectField(Class<? extends Annotation> annotationType, Object instance, Object fieldValue) {
@@ -247,8 +177,8 @@ public class PresenterFactory implements IPresenterFactory {
 					} catch (SecurityException e) {
 						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The field was inaccessible.", e);
 					} catch (IllegalArgumentException e) {
-						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The intended field value was incompatible with the field.",
-								e);
+						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field
+								+ ". The intended field value was incompatible with the field.", e);
 					} catch (IllegalAccessException e) {
 						throw new FieldInjectionException("Could not inject " + fieldValue + " into " + field + ". The field was inaccessible.", e);
 					}

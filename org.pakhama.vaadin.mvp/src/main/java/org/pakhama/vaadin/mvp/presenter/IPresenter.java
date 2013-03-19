@@ -6,8 +6,10 @@ import org.pakhama.vaadin.mvp.view.IView;
 
 public interface IPresenter<T extends IView> extends IEventHandler, IEventDispatcher {
 	T getView();
+
 	<E extends IPresenter<? extends IView>> E createChild(Class<E> presenterClass);
-	
-	void onBind();
+
+	void onBind(T view);
+
 	void onUnbind();
 }
