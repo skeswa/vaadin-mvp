@@ -11,7 +11,7 @@ import org.pakhama.vaadin.mvp.presenter.IPresenterRegistry;
 import com.vaadin.ui.Component;
 
 /**
- * In the Model-View-Presenter design pattern, The view is a passive interface
+ * In the Model-View-Presenter design pattern, the view is a passive interface
  * that displays data, the model, and routes user commands, in the for of
  * events, to the presenter to act upon that data. {@link IView} is the
  * representation of the view in this relationship. Views can dispatch events
@@ -57,8 +57,8 @@ public interface IView extends IEventDispatcher {
 	/**
 	 * This method is invoked when this {@link IView} is bound to its presenter.
 	 * The <code>onBind</code> method may be used for initialization and setup
-	 * purposes. Otherwise, the constructor is a good place for the aforesaid.
-	 * The {@link IView#getComponent()} method will not be invoked prior to
+	 * purposes. Otherwise, the default constructor should be used. The
+	 * {@link IView#getComponent()} method will not be invoked prior to
 	 * {@link IView#onBind()} method.
 	 */
 	void onBind();

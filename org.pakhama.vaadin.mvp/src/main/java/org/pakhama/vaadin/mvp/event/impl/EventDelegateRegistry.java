@@ -44,7 +44,7 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 					}
 				}
 			}
-			delegateMap.remove(handler);
+			this.handlerMap.remove(handler);
 		}
 	}
 
@@ -98,12 +98,8 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 				Class<? extends IEvent> eventType = listenerAnnotation.event();
 				HashSet<Class<? extends IEvent>> exclusionSet = convertExcludesArray(listenerAnnotation.excludes());
 				if (!isValidEventListenerMethod(eventType, method)) {
-					throw new EventListenerRegistrationException(
-							"Could not register method "
-									+ method
-									+ " as an @EventListener listening for "
-									+ eventType
-									+ ". Methods listenering for events must have either the event they are listening for as a method parameter or no parameters at all. Also, listener methods must be publicly accessible.");
+					throw new EventListenerRegistrationException("Could not register method " + method + " as an @EventListener listening for " + eventType
+							+ ". Methods listening for events must either have the event they are listening for as a method parameter OR have no parameters at all.");
 				} else {
 					// Is a valid listener method
 					// Get delegates, the delegate for the most super event type
@@ -132,12 +128,13 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 		Class<?>[] parameterTypes = method.getParameterTypes();
 		if (parameterTypes.length > 1) {
 			return false;
-		}
-		if (parameterTypes.length == 1 && !eventType.isAssignableFrom(parameterTypes[0])) {
+		} else if (parameterTypes.length == 0) {
+			return true;
+		} else if (eventType.isAssignableFrom(parameterTypes[0])) {
+			return true;
+		} else {
 			return false;
 		}
-
-		return method.isAccessible();
 	}
 
 	private HashSet<Class<? extends IEvent>> convertExcludesArray(Class<? extends IEvent>[] excludesArray) {
@@ -154,7 +151,8 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 	}
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<EventDelegate> createDelegates(Class<? extends IEvent> eventType, Collection<Class<? extends IEvent>> exclusionSet, IEventHandler handler, Method method) {
+	private ArrayList<EventDelegate> createDelegates(Class<? extends IEvent> eventType, Collection<Class<? extends IEvent>> exclusionSet, IEventHandler handler,
+			Method method) {
 		ArrayList<EventDelegate> newDelegates = new ArrayList<EventDelegate>();
 		Class<?> targetClass = eventType;
 		while (IEvent.class.isAssignableFrom(targetClass)) {
@@ -198,5 +196,10 @@ public class EventDelegateRegistry implements IEventDelegateRegistry {
 			delegateList.add(delegate);
 			delegate.addOwner(delegateList);
 		}
+	}
+
+	@Override
+	public int size() {
+		return this.handlerMap.keySet().size();
 	}
 }
