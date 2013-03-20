@@ -8,5 +8,5 @@ public interface IEventDelegate extends Serializable {
 	Class<? extends IEvent> getEventType();
 	IEventHandler getHandler();
 	
-	void kill();
+	void suicide();
 }

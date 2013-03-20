@@ -2,8 +2,8 @@ package org.pakhama.vaadin.mvp.event.impl;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventDelegate;
@@ -15,7 +15,7 @@ public class EventDelegate implements IEventDelegate {
 	private final Method method;
 	private final WeakReference<IEventHandler> handler;
 	private final Class<? extends IEvent> eventType;
-	private final ArrayList<Collection<IEventDelegate>> owners = new ArrayList<Collection<IEventDelegate>>();
+	private final HashSet<Collection<IEventDelegate>> owners = new HashSet<Collection<IEventDelegate>>();
 
 	public EventDelegate(Method method, IEventHandler handler, Class<? extends IEvent> eventType) {
 		if (method == null) {
@@ -47,52 +47,101 @@ public class EventDelegate implements IEventDelegate {
 	public Class<? extends IEvent> getEventType() {
 		return this.eventType;
 	}
-	
+
 	public void addOwner(Collection<IEventDelegate> owner) {
-		this.owners.add(owner);
+		if (!this.owners.contains(owner)) {
+			this.owners.add(owner);
+		}
 	}
-	
+
 	public void removeOwner(Collection<IEventDelegate> owner) {
 		this.owners.remove(owner);
 	}
-	
+
 	@Override
-	public void kill() {
+	public void suicide() {
 		for (Collection<IEventDelegate> owner : this.owners) {
 			owner.remove(this);
 		}
-		
-		try {
-			finalize();
-		} catch (Throwable e) {
-			// Doesn't really matter is this fails
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(getClass().getSimpleName());
+		builder.append(':');
+		builder.append('{');
+		if (method == null) {
+			builder.append("<null method>, ");
+		} else {
+			builder.append(method.getName());
+			builder.append('(');
+			builder.append(')');
+			builder.append(", ");
 		}
+		if (handler.get() == null) {
+			builder.append("<null handler>, ");
+		} else {
+			builder.append(handler.get().getClass().getSimpleName());
+			builder.append(", ");
+		}
+		if (eventType == null) {
+			builder.append("<null event type>");
+		} else {
+			builder.append(eventType.getSimpleName());
+		}
+		builder.append('}');
+
+		return builder.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (!(obj instanceof EventDelegate))
+			return false;
+		EventDelegate otherDelegate = (EventDelegate) obj;
+		if (this.method == null) {
+			if (otherDelegate.getMethod() != null)
+				return false;
+		} else {
+			if (!this.method.equals(otherDelegate.getMethod()))
+				return false;
+		}
+		if (this.handler == null) {
+			if (otherDelegate.getHandler() != null)
+				return false;
+		} else {
+			if (!this.handler.equals(otherDelegate.getHandler()))
+				return false;
+		}
+		if (this.eventType == null) {
+			if (otherDelegate.getEventType() != null)
+				return false;
+		} else {
+			if (!this.eventType.equals(otherDelegate.getEventType()))
+				return false;
+		}
+
+		return true;
 	}
 
 	@Override
 	public int hashCode() {
 		int result = 91;
 		result = result * 31;
-		result += this.method.hashCode();
+		if (this.method != null) {
+			result += this.method.hashCode();
+		}
 		result = result * 31;
 		if (this.handler.get() != null) {
 			result += this.handler.get().hashCode();
 		}
 		result = result * 31;
-		result += this.eventType.hashCode();
-
+		if (this.method != null) {
+			result += this.eventType.hashCode();
+		}
 		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof EventDelegate)) {
-			return false;
-		}
-
-		return obj.hashCode() == hashCode();
 	}
 }
