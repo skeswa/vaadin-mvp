@@ -4,9 +4,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.pakhama.vaadin.mvp.event.IEventBus;
-import org.pakhama.vaadin.mvp.event.IEventDelegateRegistry;
+import org.pakhama.vaadin.mvp.event.IEventHandlerRegistry;
 import org.pakhama.vaadin.mvp.event.impl.EventBus;
-import org.pakhama.vaadin.mvp.event.impl.EventDelegateRegistry;
+import org.pakhama.vaadin.mvp.event.impl.EventHandlerRegistry;
 import org.pakhama.vaadin.mvp.event.one.OneTestEvent;
 import org.pakhama.vaadin.mvp.presenter.impl.PresenterFactory;
 import org.pakhama.vaadin.mvp.presenter.impl.registry.PresenterRegistry;
@@ -24,7 +24,7 @@ public class PresenterFactoryTest {
 		IViewRegistry viewRegistry = new ViewRegistry();
 		IViewFactory viewFactory = new ViewFactory(viewRegistry);
 		IPresenterRegistry presenterRegistry = new PresenterRegistry();
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 		IEventBus eventBus = new EventBus(delegateRegistry, presenterRegistry);
 		IPresenterFactory factory = new PresenterFactory(eventBus, viewFactory, presenterRegistry);
 		OnePresenter presenter = factory.create(OnePresenter.class);
@@ -50,7 +50,7 @@ public class PresenterFactoryTest {
 		IViewRegistry viewRegistry = new ViewRegistry();
 		IViewFactory viewFactory = new ViewFactory(viewRegistry);
 		IPresenterRegistry presenterRegistry = new PresenterRegistry();
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 		IEventBus eventBus = new EventBus(delegateRegistry, presenterRegistry);
 		IPresenterFactory factory = new PresenterFactory(eventBus, viewFactory, presenterRegistry);
 		OnePresenter presenter = factory.create(OnePresenter.class);

@@ -1,6 +1,7 @@
 package org.pakhama.vaadin.mvp.event.impl;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
@@ -143,5 +144,33 @@ public class EventDelegate implements IEventDelegate {
 			result += this.eventType.hashCode();
 		}
 		return result;
+	}
+
+	@Override
+	public void invoke(IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		IEventHandler handlerInstance = this.handler.get();
+		if (handlerInstance == null) {
+			// If the handler dies, so does its delegate
+			suicide();
+			// The invoke() didn't technically fail - so, lets forget this ever happened
+			return;
+		}
+		
+		if (this.method.getParameterTypes().length == 0) {
+			this.method.invoke(handlerInstance);
+		} else if (this.method.getParameterTypes().length == 1) {
+			if (event == null) {
+				throw new IllegalArgumentException("The method parameter cannot be null.");
+			} else if (!eventType.isAssignableFrom(event.getClass())) {
+				throw new IllegalArgumentException("The event parameter did not match the event type of this delegate.");
+			} else {
+				this.method.invoke(handlerInstance, event);
+			}
+		} else {
+			throw new IllegalArgumentException(
+					"The event handler method "
+							+ method.getName()
+							+ "(..) had more than one argument. Event handler methods must specify either no arguments, or one argument which shares the event of its @EventListener annotation.");
+		}
 	}
 }

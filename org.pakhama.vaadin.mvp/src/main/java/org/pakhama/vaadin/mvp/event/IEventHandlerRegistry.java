@@ -3,7 +3,7 @@ package org.pakhama.vaadin.mvp.event;
 import java.io.Serializable;
 import java.util.Collection;
 
-public interface IEventDelegateRegistry extends Serializable {
+public interface IEventHandlerRegistry extends Serializable {
 	void register(IEventHandler handler);
 	void unregister(IEventHandler handler);
 	void clear();

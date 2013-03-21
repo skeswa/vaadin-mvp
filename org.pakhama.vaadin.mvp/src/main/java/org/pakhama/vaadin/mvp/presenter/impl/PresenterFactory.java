@@ -155,12 +155,9 @@ public class PresenterFactory implements IPresenterFactory {
 			// Swallow the exception, its ok if the presenter doesn't have the
 			// presenter factory field marked by @Factory
 		}
-		// Register the presenter-view pair to the presenter registry
+		// Register the presenter-view pair to the proper registries
+		this.eventBus.getRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
-		// Fire the initialization methods to begin the life cycle of the
-		// respective view and presenter
-		viewInstance.onBind();
-		((IPresenter<IView>) presenterInstance).onBind(viewInstance);
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}

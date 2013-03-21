@@ -5,5 +5,5 @@ import java.io.Serializable;
 public interface IEventBus extends Serializable {
 	void propagate(IEvent event, IEventDispatcher dispatcher, EventScope scope);
 	
-	IEventDelegateRegistry getRegistry();
+	IEventHandlerRegistry getRegistry();
 }

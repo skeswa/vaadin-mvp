@@ -27,7 +27,7 @@ public class PresenterRegistry implements IPresenterRegistry {
 		this.viewPresenterMap.put(view, presenter);
 
 		// Welcome the new presenter with open arms, then whisper into its ear
-		// that its days are numbered
+		// that its days are numbered >:-D
 		((IPresenter<IView>) presenter).onBind(view);
 	}
 

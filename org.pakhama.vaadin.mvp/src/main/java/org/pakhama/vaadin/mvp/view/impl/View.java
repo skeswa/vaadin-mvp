@@ -59,14 +59,6 @@ public class View extends VerticalLayout implements IView {
 	public void onUnbind() {
 		// Get rid of instance variables
 		this.eventBus = null;
-		// Suicide as Vaadin component
-		detach();
-		// Request that this class be garbage collected
-		try {
-			finalize();
-		} catch (Throwable e) {
-			// Doesn't matter if finalize failed
-		}
 	}
 
 	@Override

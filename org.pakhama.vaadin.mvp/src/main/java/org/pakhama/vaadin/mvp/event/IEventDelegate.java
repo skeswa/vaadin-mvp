@@ -1,6 +1,7 @@
 package org.pakhama.vaadin.mvp.event;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public interface IEventDelegate extends Serializable {
@@ -9,4 +10,5 @@ public interface IEventDelegate extends Serializable {
 	IEventHandler getHandler();
 	
 	void suicide();
+	void invoke(IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;
 }

@@ -22,7 +22,7 @@ public enum EventScope {
 	 * parent of the event source is null, then the event will not be
 	 * propagated.
 	 */
-	SIBLING,
+	SIBLINGS,
 	/**
 	 * If the event source is a presenter, then this event will be propagated to
 	 * only the children of the event source.

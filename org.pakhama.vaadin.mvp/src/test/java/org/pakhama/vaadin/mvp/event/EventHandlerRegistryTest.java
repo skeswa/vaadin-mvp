@@ -6,17 +6,17 @@ import java.util.Collection;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.pakhama.vaadin.mvp.event.impl.EventDelegateRegistry;
+import org.pakhama.vaadin.mvp.event.impl.EventHandlerRegistry;
 import org.pakhama.vaadin.mvp.event.one.AnotherOneTestEvent;
 import org.pakhama.vaadin.mvp.event.one.FinallyAnotherOneTestEvent;
 import org.pakhama.vaadin.mvp.event.one.OneEventHandler;
 import org.pakhama.vaadin.mvp.event.one.YetAnotherOneTestEvent;
 
-public class EventDelegateRegistryTest {
+public class EventHandlerRegistryTest {
 
 	@Test
 	public void testRegister() {
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 		Assert.assertTrue(delegateRegistry.size() == 0);
 		delegateRegistry.register(new OneEventHandler());
 		Assert.assertTrue(delegateRegistry.size() == 1);
@@ -28,7 +28,7 @@ public class EventDelegateRegistryTest {
 
 	@Test
 	public void testUnregister() {
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 
 		OneEventHandler oneHandler1 = new OneEventHandler();
 		OneEventHandler oneHandler2 = new OneEventHandler();
@@ -51,7 +51,7 @@ public class EventDelegateRegistryTest {
 
 	@Test
 	public void testFind() {
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 
 		OneEventHandler oneHandler1 = new OneEventHandler();
 
@@ -67,7 +67,7 @@ public class EventDelegateRegistryTest {
 
 	@Test
 	public void testFindWithHandlers() {
-		IEventDelegateRegistry delegateRegistry = new EventDelegateRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
 
 		OneEventHandler oneHandler1 = new OneEventHandler();
 		OneEventHandler oneHandler2 = new OneEventHandler();

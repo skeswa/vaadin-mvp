@@ -9,15 +9,15 @@ import java.util.HashSet;
 import org.pakhama.vaadin.mvp.annotation.event.EventListener;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventDelegate;
-import org.pakhama.vaadin.mvp.event.IEventDelegateRegistry;
+import org.pakhama.vaadin.mvp.event.IEventHandlerRegistry;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
 import org.pakhama.vaadin.mvp.exception.EventListenerRegistrationException;
 
-public class EventDelegateRegistry implements IEventDelegateRegistry {
+public class EventHandlerRegistry implements IEventHandlerRegistry {
 	private static final long serialVersionUID = -6658219565978880435L;
 	/**
 	 * This map is the union of every entry in the the
-	 * {@link EventDelegateRegistry#handlerMap}. This is specifically useful for
+	 * {@link EventHandlerRegistry#handlerMap}. This is specifically useful for
 	 * finding all delegates that must be fired for a specific event type
 	 * without an expensive looping function.
 	 */

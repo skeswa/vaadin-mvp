@@ -3,15 +3,14 @@ package org.pakhama.vaadin.mvp.event.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.IEventDelegate;
-import org.pakhama.vaadin.mvp.event.IEventDelegateRegistry;
 import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
+import org.pakhama.vaadin.mvp.event.IEventHandlerRegistry;
 import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
 import org.pakhama.vaadin.mvp.exception.EventPropagationException;
 import org.pakhama.vaadin.mvp.presenter.IPresenter;
@@ -21,10 +20,10 @@ import org.pakhama.vaadin.mvp.view.IView;
 public class EventBus implements IEventBus {
 	private static final long serialVersionUID = -5989527350073214759L;
 
-	private IEventDelegateRegistry delegateRegistry;
+	private IEventHandlerRegistry delegateRegistry;
 	private IPresenterRegistry presenterRegistry;
 
-	public EventBus(IEventDelegateRegistry delegateRegistry, IPresenterRegistry presenterRegistry) {
+	public EventBus(IEventHandlerRegistry delegateRegistry, IPresenterRegistry presenterRegistry) {
 		if (delegateRegistry == null) {
 			throw new IllegalArgumentException("The delegateRegistry parameter cannot be null.");
 		}
@@ -64,7 +63,7 @@ public class EventBus implements IEventBus {
 				throw new EventPropagationException("EventScope.CHILDREN is only applicable for event handlers of type IPresenter.");
 			}
 			break;
-		case SIBLING:
+		case SIBLINGS:
 			// This scope is only applicable for dispatchers of type IPresenter
 			if (dispatcher instanceof IPresenter<?>) {
 				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) dispatcher);
@@ -79,18 +78,23 @@ public class EventBus implements IEventBus {
 			// This scope is only applicable for dispatchers of type IPresenter
 			// OR IView
 			if (dispatcher instanceof IPresenter<?>) {
-				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) dispatcher);
-				if (siblings != null) {
-					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(siblings));
+				IPresenter<?> parent = this.presenterRegistry.parentOf((IPresenter<?>) dispatcher);
+				if (parent != null) {
+					// Since the find method only takes collections, we need to wrap the parent
+					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
+					parentWrapper.add(parent);
+					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
 				}
 			} else if (dispatcher instanceof IView) {
 				IPresenter<?> parent = this.presenterRegistry.find((IView) dispatcher);
 				if (parent != null) {
-					LinkedList<IEventHandler> parentWrapper = new LinkedList<IEventHandler>();
+					// Since the find method only takes collections, we need to wrap the parent
+					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
+					parentWrapper.add(parent);
 					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
 				}
 			} else {
-				throw new EventPropagationException("EventScope.SIBLINGS is only applicable for event handlers of type IPresenter.");
+				throw new EventPropagationException("EventScope.PARENT is only applicable for event handlers of type IPresenter or IView.");
 			}
 			break;
 		case UNIVERAL:
@@ -99,37 +103,23 @@ public class EventBus implements IEventBus {
 		}
 
 		if (delegates != null) {
-			EventListenerInvocationException ex = new EventListenerInvocationException("There were event handlers that were not invoked. ", new ArrayList<Throwable>());
 			for (IEventDelegate delegate : delegates) {
 				try {
-					invokeDelegate(delegate, event);
+					delegate.invoke(event);
 				} catch (IllegalArgumentException e) {
-					ex.getCauses().add(e);
+					throw new EventListenerInvocationException("The parameter requirements of an @EventListener could not be satisfied. The delegate that failed to invoke was " + delegate + ".", e);
 				} catch (IllegalAccessException e) {
-					ex.getCauses().add(e);
+					throw new EventListenerInvocationException("The an @EventListener could not be accessed. The delegate that failed to invoke was " + delegate + ".", e);
 				} catch (InvocationTargetException e) {
-					ex.getCauses().add(e);
+					throw new EventListenerInvocationException("There was an exception inside the body of an @EventListener method. The delegate that failed to invoke was " + delegate + ".", e);
 				}
-			}
-			
-			if (ex.getCauses().size() != 0) {
-				throw ex;
 			}
 		}
 	}
 
 	@Override
-	public IEventDelegateRegistry getRegistry() {
+	public IEventHandlerRegistry getRegistry() {
 		return this.delegateRegistry;
 	}
 
-	private void invokeDelegate(IEventDelegate delegate, IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		if (delegate.getMethod().getParameterTypes().length == 0) {
-			delegate.getMethod().invoke(delegate.getHandler());
-		} else if (delegate.getMethod().getParameterTypes().length == 1) {
-			delegate.getMethod().invoke(delegate.getHandler(), event);
-		} else {
-			throw new IllegalArgumentException("The event handler method " + delegate.getMethod() + " had more than one argument. Event handler methods must specify either no arguments, or one argument which shares the event of its @EventListener annotation.");
-		}
-	}
 }
