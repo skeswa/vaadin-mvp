@@ -5,7 +5,7 @@
 	<artifactId>org.pakhama.vaadin.mvp</artifactId>
 	<version>0.0.4.1</version>
 	<name>MVP for Vaadin</name>
-	<description>The Pakhama Labs Model-View-Presenter Implementation for Vaadin 6.X.X</description>
+	<description>The Pakhama Labs Model-View-Presenter Implementation for Vaadin 6</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>4.10</junit.version>
