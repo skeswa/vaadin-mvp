@@ -2,7 +2,7 @@ package org.pakhama.vaadin.mvp.view.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.pakhama.vaadin.mvp.exception.ViewRegistrationException;
 import org.pakhama.vaadin.mvp.view.IView;
@@ -12,7 +12,7 @@ import org.pakhama.vaadin.mvp.view.IViewRegistry;
 public class ViewRegistry implements IViewRegistry {
 	private static final long serialVersionUID = -3658969717696659192L;
 
-	private HashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>> viewCache = new HashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>>();
+	private ConcurrentHashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>> viewCache = new ConcurrentHashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>>();
 
 	@Override
 	public void register(Class<? extends IView> viewImplClass) {

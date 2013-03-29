@@ -1,21 +1,8 @@
 package org.pakhama.vaadin.mvp.event.one;
 
-import org.pakhama.vaadin.mvp.event.IEvent;
-import org.pakhama.vaadin.mvp.event.IEventDispatcher;
+import org.pakhama.vaadin.mvp.event.impl.Event;
 
-public class OneTestEvent implements IEvent {
+public class OneTestEvent extends Event {
 	private static final long serialVersionUID = 1L;
-	
-	private IEventDispatcher source;
-
-	@Override
-	public IEventDispatcher getSource() {
-		return this.source;
-	}
-
-	@Override
-	public void setSource(IEventDispatcher source) {
-		this.source = source;
-	}
 
 }

@@ -47,10 +47,7 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 
 	@Override
 	public void dispatch(IEvent event) {
-		if (event == null) {
-			throw new IllegalArgumentException("The event parameter was null.");
-		}
-		this.eventBus.propagate(event, this, EventScope.UNIVERAL);
+		dispatch(event, EventScope.APPLICATION);
 	}
 
 	@Override
@@ -62,7 +59,8 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			throw new IllegalArgumentException("The scope parameter was null.");
 		}
 
-		this.eventBus.propagate(event, this, scope);
+		event.setSource(this);
+		this.eventBus.propagate(event, scope);
 	}
 
 	@Override

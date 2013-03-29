@@ -8,9 +8,9 @@ import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.IEventDelegate;
-import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
 import org.pakhama.vaadin.mvp.event.IEventHandlerRegistry;
+import org.pakhama.vaadin.mvp.event.IUniversalEventBus;
 import org.pakhama.vaadin.mvp.exception.EventListenerInvocationException;
 import org.pakhama.vaadin.mvp.exception.EventPropagationException;
 import org.pakhama.vaadin.mvp.presenter.IPresenter;
@@ -22,6 +22,7 @@ public class EventBus implements IEventBus {
 
 	private IEventHandlerRegistry delegateRegistry;
 	private IPresenterRegistry presenterRegistry;
+	private IUniversalEventBus universalEventBus;
 
 	public EventBus(IEventHandlerRegistry delegateRegistry, IPresenterRegistry presenterRegistry) {
 		if (delegateRegistry == null) {
@@ -36,26 +37,24 @@ public class EventBus implements IEventBus {
 	}
 
 	@Override
-	public void propagate(IEvent event, IEventDispatcher dispatcher, EventScope scope) {
+	public void propagate(IEvent event, EventScope scope) {
 		if (event == null) {
 			throw new IllegalArgumentException("The event parameter cannot be null.");
 		}
-		if (dispatcher == null) {
-			throw new IllegalArgumentException("The dispatcher parameter cannot be null.");
+		if (event.getSource() == null) {
+			throw new IllegalArgumentException("The event source cannot be null.");
 		}
 		if (scope == null) {
 			throw new IllegalArgumentException("The registry parameter cannot be null.");
 		}
 
 		Collection<IEventDelegate> delegates = null;
-		// Set the source of the event
-		event.setSource(dispatcher);
 		// Choose propagation strategy
 		switch (scope) {
 		case CHILDREN:
 			// This scope is only applicable for dispatchers of type IPresenter
-			if (dispatcher instanceof IPresenter<?>) {
-				Collection<IPresenter<?>> children = this.presenterRegistry.childrenOf((IPresenter<?>) dispatcher);
+			if (event.getSource() instanceof IPresenter<?>) {
+				Collection<IPresenter<?>> children = this.presenterRegistry.childrenOf((IPresenter<?>) event.getSource());
 				if (children != null) {
 					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(children));
 				}
@@ -65,8 +64,8 @@ public class EventBus implements IEventBus {
 			break;
 		case SIBLINGS:
 			// This scope is only applicable for dispatchers of type IPresenter
-			if (dispatcher instanceof IPresenter<?>) {
-				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) dispatcher);
+			if (event.getSource() instanceof IPresenter<?>) {
+				Collection<IPresenter<?>> siblings = this.presenterRegistry.siblingsOf((IPresenter<?>) event.getSource());
 				if (siblings != null) {
 					delegates = this.delegateRegistry.find(event.getClass(), new ArrayList<IEventHandler>(siblings));
 				}
@@ -77,16 +76,16 @@ public class EventBus implements IEventBus {
 		case PARENT:
 			// This scope is only applicable for dispatchers of type IPresenter
 			// OR IView
-			if (dispatcher instanceof IPresenter<?>) {
-				IPresenter<?> parent = this.presenterRegistry.parentOf((IPresenter<?>) dispatcher);
+			if (event.getSource() instanceof IPresenter<?>) {
+				IPresenter<?> parent = this.presenterRegistry.parentOf((IPresenter<?>) event.getSource());
 				if (parent != null) {
 					// Since the find method only takes collections, we need to wrap the parent
 					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
 					parentWrapper.add(parent);
 					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
 				}
-			} else if (dispatcher instanceof IView) {
-				IPresenter<?> parent = this.presenterRegistry.find((IView) dispatcher);
+			} else if (event.getSource() instanceof IView) {
+				IPresenter<?> parent = this.presenterRegistry.find((IView) event.getSource());
 				if (parent != null) {
 					// Since the find method only takes collections, we need to wrap the parent
 					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
@@ -97,9 +96,15 @@ public class EventBus implements IEventBus {
 				throw new EventPropagationException("EventScope.PARENT is only applicable for event handlers of type IPresenter or IView.");
 			}
 			break;
-		case UNIVERAL:
+		case APPLICATION:
 			delegates = this.delegateRegistry.find(event.getClass());
 			break;
+		case UNIVERSAL:
+			// Keep in mind, UNIVERSAL just means APPLICATION for this bus
+			delegates = this.delegateRegistry.find(event.getClass());
+			if (this.universalEventBus != null) {
+				this.universalEventBus.propagate(event, this);
+			}
 		}
 
 		if (delegates != null) {
@@ -120,6 +125,16 @@ public class EventBus implements IEventBus {
 	@Override
 	public IEventHandlerRegistry getRegistry() {
 		return this.delegateRegistry;
+	}
+
+	@Override
+	public void onBind(IUniversalEventBus universalEventBus) {
+		this.universalEventBus = universalEventBus;
+	}
+
+	@Override
+	public void onUnbind() {
+		this.universalEventBus = null;
 	}
 
 }

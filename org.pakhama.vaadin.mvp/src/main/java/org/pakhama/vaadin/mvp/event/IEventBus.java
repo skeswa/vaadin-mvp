@@ -3,7 +3,10 @@ package org.pakhama.vaadin.mvp.event;
 import java.io.Serializable;
 
 public interface IEventBus extends Serializable {
-	void propagate(IEvent event, IEventDispatcher dispatcher, EventScope scope);
-	
+	void propagate(IEvent event, EventScope scope);
+
+	void onBind(IUniversalEventBus universalEventBus);
+	void onUnbind();
+
 	IEventHandlerRegistry getRegistry();
 }

@@ -25,7 +25,7 @@ public class AnotherTwoPresenter extends Presenter<TwoView> {
 	}
 	
 	@EventListener(event = AnotherTwoTestEvent.class)
-	public void onAnotherTwoTest() {
+	public void onAnotherTwoTest(AnotherTwoTestEvent e) {
 		if (this.tracker != null)
 		this.tracker.anotherTwoReceived = true;
 	}

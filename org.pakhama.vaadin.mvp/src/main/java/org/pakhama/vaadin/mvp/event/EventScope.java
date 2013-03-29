@@ -29,8 +29,14 @@ public enum EventScope {
 	 */
 	CHILDREN,
 	/**
-	 * Propagate the event to all event listeners registered under the event bus
-	 * firing the event. This scope is the default for all events.
+	 * Propagate the event to all event listeners registered under this
+	 * session's event bus. This scope is the default for all events.
 	 */
-	UNIVERAL
+	APPLICATION,
+	/**
+	 * Propagate the event to all event listeners registered in <b><i>every
+	 * session's event bus.</i></b> This scope should be employed with care,
+	 * since propagating an event of this scope is very expensive.
+	 */
+	UNIVERSAL
 }
