@@ -123,7 +123,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 				// wrong
 				validateEventListenerMethod(eventType, method);
 				// Create and register a new delegate for this handler/method
-				EventDelegate newDelegate = new EventDelegate(method, handler, eventType);
+				EventDelegate newDelegate = new EventDelegate(method, handler, eventType, listenerAnnotation.allowForeign());
 				registerDelegate(this.unifiedHandlerMap, exclusionSet, newDelegate);
 				registerDelegate(ensureHandlerDelegateMap(handler), exclusionSet, newDelegate);
 			}

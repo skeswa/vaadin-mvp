@@ -16,9 +16,10 @@ public class EventDelegate implements IEventDelegate {
 	private final Method method;
 	private final WeakReference<IEventHandler> handler;
 	private final Class<? extends IEvent> eventType;
+	private final boolean allowForeign;
 	private final HashSet<Collection<IEventDelegate>> owners = new HashSet<Collection<IEventDelegate>>();
 
-	public EventDelegate(Method method, IEventHandler handler, Class<? extends IEvent> eventType) {
+	public EventDelegate(Method method, IEventHandler handler, Class<? extends IEvent> eventType, boolean allowForeign) {
 		if (method == null) {
 			throw new IllegalArgumentException("The method parameter cannot be null when creating a " + getClass().getSimpleName() + ".");
 		}
@@ -32,6 +33,7 @@ public class EventDelegate implements IEventDelegate {
 		this.method = method;
 		this.handler = new WeakReference<IEventHandler>(handler);
 		this.eventType = eventType;
+		this.allowForeign = allowForeign;
 	}
 
 	@Override
@@ -152,25 +154,30 @@ public class EventDelegate implements IEventDelegate {
 		if (handlerInstance == null) {
 			// If the handler dies, so does its delegate
 			suicide();
-			// The invoke() didn't technically fail - so, lets forget this ever happened
+			// The invoke() didn't technically fail - so, lets forget this ever
+			// happened
 			return;
 		}
-		
-		if (this.method.getParameterTypes().length == 0) {
-			this.method.invoke(handlerInstance);
-		} else if (this.method.getParameterTypes().length == 1) {
-			if (event == null) {
-				throw new IllegalArgumentException("The method parameter cannot be null.");
-			} else if (!eventType.isAssignableFrom(event.getClass())) {
-				throw new IllegalArgumentException("The event parameter did not match the event type of this delegate.");
-			} else {
-				this.method.invoke(handlerInstance, event);
-			}
+		// If this delegate won't take foreign, then don't give it any
+		if (!this.allowForeign && event.isForeign()) {
+			return;
 		} else {
-			throw new IllegalArgumentException(
-					"The event handler method "
-							+ method.getName()
-							+ "(..) had more than one argument. Event handler methods must specify either no arguments, or one argument which shares the event of its @EventListener annotation.");
+			if (this.method.getParameterTypes().length == 0) {
+				this.method.invoke(handlerInstance);
+			} else if (this.method.getParameterTypes().length == 1) {
+				if (event == null) {
+					throw new IllegalArgumentException("The method parameter cannot be null.");
+				} else if (!eventType.isAssignableFrom(event.getClass())) {
+					throw new IllegalArgumentException("The event parameter did not match the event type of this delegate.");
+				} else {
+					this.method.invoke(handlerInstance, event);
+				}
+			} else {
+				throw new IllegalArgumentException(
+						"The event handler method "
+								+ method.getName()
+								+ "(..) had more than one argument. Event handler methods must specify either no arguments, or one argument which shares the event of its @EventListener annotation.");
+			}
 		}
 	}
 }

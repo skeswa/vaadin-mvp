@@ -1,6 +1,7 @@
 package org.pakhama.vaadin.mvp.presenter;
 
 import org.pakhama.vaadin.mvp.annotation.field.EventBus;
+import org.pakhama.vaadin.mvp.annotation.field.Factory;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.IEventDispatcher;

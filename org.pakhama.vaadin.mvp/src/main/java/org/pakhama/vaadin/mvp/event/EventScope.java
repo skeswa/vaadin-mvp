@@ -3,7 +3,7 @@ package org.pakhama.vaadin.mvp.event;
 /**
  * The
  * <code>EventScope<code> defines general event propagation restrictions for the event bus to adhere to in the <code>fire()</code>
- * method. All {@link Event}s specify an {@link EventScope} by definition. The
+ * method. All {@link IEvent}s specify an {@link EventScope} by definition. The
  * default {@link EventScope} is typically <code>EventScope.ALL</code>.
  * 
  * @author Sandile
