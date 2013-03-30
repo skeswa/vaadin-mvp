@@ -40,7 +40,7 @@ public class UniversalEventBus implements IUniversalEventBus {
 						if (!eventBus.equals(origin)) {
 							// Make sure everyone knows that the event came from
 							// another guy
-							event = event.copy();
+							event = event.duplicate();
 							// Make events for the event busses copies so we can
 							// markForeign() with worrying
 							event.markForeign();

@@ -1,5 +1,8 @@
 package org.pakhama.vaadin.mvp.event.impl;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 
@@ -32,28 +35,37 @@ public class Event implements IEvent {
 	}
 
 	@Override
-	public IEvent copy() {
+	public IEvent duplicate() {
 		try {
-			Event copy = getClass().newInstance();
-			copy.source = this.source;
-			copy.foreign = this.foreign;
-			return copy;
+			IEvent duplicate = getClass().newInstance();
+			for (Class<?> currentClass = duplicate.getClass(); !currentClass.equals(Object.class); currentClass = currentClass.getSuperclass()) {
+				Field[] fields = currentClass.getDeclaredFields();
+				for (int i = 0; i < fields.length; i++) {
+					if (fields[i] != null && !Modifier.isFinal(fields[i].getModifiers()) && !Modifier.isStatic(fields[i].getModifiers())) {
+						// Only copy over fields that can be copied
+						fields[i].setAccessible(true);
+						fields[i].set(duplicate, fields[i].get(this));
+					}
+				}
+			}
+			// If we got this far, we doin' good
+			return duplicate;
 		} catch (Exception e) {
-			throw new EventCopyException(e);
+			// Catch all "there was a problem somewhere" exception
+			throw new EventDuplicationException(e);
 		}
 	}
-	
-	private class EventCopyException extends RuntimeException {
-		private static final long serialVersionUID = -5820248944626201307L;
 
-		public EventCopyException(Throwable cause) {
+	private class EventDuplicationException extends RuntimeException {
+		private static final long serialVersionUID = -9020152222677934642L;
+
+		EventDuplicationException(Throwable cause) {
 			initCause(cause);
 		}
-		
+
 		@Override
 		public String getMessage() {
-			return "Could not clone this event.";
+			return "Could not duplicate this event.";
 		}
 	}
-
 }
