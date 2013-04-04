@@ -15,7 +15,7 @@ public class UniversalEventBus implements IUniversalEventBus {
 	private ArrayList<SoftReference<IEventBus>> eventBusList = new ArrayList<SoftReference<IEventBus>>();
 
 	@Override
-	public void propagate(IEvent event, IEventBus origin) {
+	public int propagate(IEvent event, IEventBus origin) {
 		if (event == null) {
 			throw new IllegalArgumentException("The event parameter cannot be null.");
 		}
@@ -23,9 +23,13 @@ public class UniversalEventBus implements IUniversalEventBus {
 			throw new IllegalArgumentException("The origin parameter cannot be null.");
 		}
 
+		// Keep track of successful propagations so we can return the count
+		int successfulPropagations = 0;
+
 		synchronized (this.eventBusList) {
 			ArrayList<SoftReference<IEventBus>> killList = null;
 			IEventBus eventBus = null;
+
 			for (SoftReference<IEventBus> eventBusRef : this.eventBusList) {
 				if (eventBusRef != null) {
 					eventBus = eventBusRef.get();
@@ -36,15 +40,19 @@ public class UniversalEventBus implements IUniversalEventBus {
 						}
 						killList.add(eventBusRef);
 					} else {
-						// ITS ALIIVVEE
+						// ITS ALIIVVEE (the soft reference didn't perish in the
+						// night); Also, make sure we don't propagate back to
+						// the original bus
 						if (!eventBus.equals(origin)) {
 							// Make sure everyone knows that the event came from
 							// another guy
 							event = event.duplicate();
-							// Make events for the event busses copies so we can
-							// markForeign() with worrying
+							// Make a copy of the event for the other busses so
+							// we can markForeign() without worrying
 							event.markForeign();
 							eventBus.propagate(event, EventScope.APPLICATION);
+							// This will only increment if invocation succeeded
+							successfulPropagations++;
 						}
 					}
 				}
@@ -56,6 +64,9 @@ public class UniversalEventBus implements IUniversalEventBus {
 				}
 			}
 		}
+		
+		// Return the number of successful propagations
+		return successfulPropagations;
 	}
 
 	@Override
@@ -71,7 +82,8 @@ public class UniversalEventBus implements IUniversalEventBus {
 					return;
 				}
 			}
-
+			// Everything's going according to plan, so add the new bus to our
+			// list
 			this.eventBusList.add(new SoftReference<IEventBus>(eventBus));
 			eventBus.onBind(this);
 		}

@@ -1,5 +1,6 @@
 package org.pakhama.vaadin.mvp.view;
 
+import org.pakhama.vaadin.mvp.annotation.event.EventListener;
 import org.pakhama.vaadin.mvp.annotation.field.EventBus;
 import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
@@ -73,4 +74,15 @@ public interface IView extends IEventDispatcher {
 	 * returned by the {@link IView#getComponent()} method).
 	 */
 	void onUnbind();
+
+	/**
+	 * This method dispatches the event provided as the <code>event</code>
+	 * parameter to this view's {@link IPresenter}. The provided event may be
+	 * handled by this view's presenter with a publicly accessible method
+	 * correctly annotated by the {@link EventListener} annotation.
+	 * 
+	 * @param event
+	 *            the event to dispatch to this view's parent presenter
+	 */
+	int dispatch(IEvent event);
 }

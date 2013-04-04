@@ -146,7 +146,7 @@ public class EventBusTest {
 		Assert.assertTrue(tracker1.anotherTwoReceived);
 		Assert.assertTrue(tracker1.twoReceived);
 
-		anotherTwoPresenter.getView().dispatch(new YetAnotherTwoTestEvent(), EventScope.PARENT);
+		anotherTwoPresenter.getView().dispatch(new YetAnotherTwoTestEvent());
 
 		Assert.assertTrue(tracker2.yetAnotherTwoReceived);
 		Assert.assertTrue(tracker2.anotherTwoReceived);
@@ -217,5 +217,23 @@ public class EventBusTest {
 		Assert.assertFalse(tracker1.yetAnotherTwoReceived);
 		Assert.assertFalse(tracker1.anotherTwoReceived);
 		Assert.assertFalse(tracker1.twoReceived);
+	}
+	
+	@Test
+	public void testPropagateCount() {
+		IViewRegistry viewRegistry = new ViewRegistry();
+		IViewFactory viewFactory = new ViewFactory(viewRegistry);
+		IPresenterRegistry presenterRegistry = new PresenterRegistry();
+		IEventHandlerRegistry delegateRegistry = new EventHandlerRegistry();
+		IEventBus eventBus = new EventBus(delegateRegistry, presenterRegistry);
+		IPresenterFactory factory = new PresenterFactory(eventBus, viewFactory, presenterRegistry);
+
+		AnotherTwoPresenter parentTwoPresenter = factory.create(AnotherTwoPresenter.class);
+		parentTwoPresenter.createChild(AnotherTwoPresenter.class);
+		parentTwoPresenter.createChild(AnotherTwoPresenter.class);
+		parentTwoPresenter.createChild(AnotherTwoPresenter.class);
+		int count = parentTwoPresenter.dispatch(new YetAnotherTwoTestEvent(), EventScope.CHILDREN);
+
+		Assert.assertEquals(9 /* (3 propagations for each child) */, count);
 	}
 }

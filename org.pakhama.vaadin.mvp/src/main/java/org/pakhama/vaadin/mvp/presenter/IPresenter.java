@@ -4,8 +4,8 @@ import org.pakhama.vaadin.mvp.annotation.field.EventBus;
 import org.pakhama.vaadin.mvp.annotation.field.Factory;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
-import org.pakhama.vaadin.mvp.event.IEventDispatcher;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
+import org.pakhama.vaadin.mvp.event.IScopedEventDispatcher;
 import org.pakhama.vaadin.mvp.view.IView;
 
 /**
@@ -43,7 +43,7 @@ import org.pakhama.vaadin.mvp.view.IView;
  *            the view type used by this presenter; it must extends
  *            {@link IView}
  */
-public interface IPresenter<T extends IView> extends IEventHandler, IEventDispatcher {
+public interface IPresenter<T extends IView> extends IEventHandler, IScopedEventDispatcher {
 	/**
 	 * Gets the view instance of this presenter. The view instance will always
 	 * implement the {@link IView} type specified in the the generic of the

@@ -37,7 +37,7 @@ public class EventBus implements IEventBus {
 	}
 
 	@Override
-	public void propagate(IEvent event, EventScope scope) {
+	public int propagate(IEvent event, EventScope scope) {
 		if (event == null) {
 			throw new IllegalArgumentException("The event parameter cannot be null.");
 		}
@@ -47,6 +47,9 @@ public class EventBus implements IEventBus {
 		if (scope == null) {
 			throw new IllegalArgumentException("The registry parameter cannot be null.");
 		}
+
+		// Keep track of successful propagations so we can return the count
+		int successfulPropagations = 0;
 
 		Collection<IEventDelegate> delegates = null;
 		// Choose propagation strategy
@@ -79,7 +82,8 @@ public class EventBus implements IEventBus {
 			if (event.getSource() instanceof IPresenter<?>) {
 				IPresenter<?> parent = this.presenterRegistry.parentOf((IPresenter<?>) event.getSource());
 				if (parent != null) {
-					// Since the find method only takes collections, we need to wrap the parent
+					// Since the find method only takes collections, we need to
+					// wrap the parent
 					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
 					parentWrapper.add(parent);
 					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
@@ -87,7 +91,8 @@ public class EventBus implements IEventBus {
 			} else if (event.getSource() instanceof IView) {
 				IPresenter<?> parent = this.presenterRegistry.find((IView) event.getSource());
 				if (parent != null) {
-					// Since the find method only takes collections, we need to wrap the parent
+					// Since the find method only takes collections, we need to
+					// wrap the parent
 					ArrayList<IEventHandler> parentWrapper = new ArrayList<IEventHandler>(1);
 					parentWrapper.add(parent);
 					delegates = this.delegateRegistry.find(event.getClass(), parentWrapper);
@@ -100,10 +105,11 @@ public class EventBus implements IEventBus {
 			delegates = this.delegateRegistry.find(event.getClass());
 			break;
 		case UNIVERSAL:
-			// Keep in mind, UNIVERSAL just means APPLICATION for this bus
+			// Keep in mind, EventScope.UNIVERSAL just means EventScope.APPLICATION for every other
+			// bus - we have to do our own EventScope.APPLICATION propagation
 			delegates = this.delegateRegistry.find(event.getClass());
 			if (this.universalEventBus != null) {
-				this.universalEventBus.propagate(event, this);
+				successfulPropagations = this.universalEventBus.propagate(event, this);
 			}
 		}
 
@@ -111,15 +117,22 @@ public class EventBus implements IEventBus {
 			for (IEventDelegate delegate : delegates) {
 				try {
 					delegate.invoke(event);
+					// This will only increment if invocation succeeded
+					successfulPropagations++;
 				} catch (IllegalArgumentException e) {
-					throw new EventListenerInvocationException("The parameter requirements of an @EventListener could not be satisfied. The delegate that failed to invoke was " + delegate + ".", e);
+					throw new EventListenerInvocationException(
+							"The parameter requirements of an @EventListener could not be satisfied. The delegate that failed to invoke was " + delegate + ".", e);
 				} catch (IllegalAccessException e) {
 					throw new EventListenerInvocationException("The an @EventListener could not be accessed. The delegate that failed to invoke was " + delegate + ".", e);
 				} catch (InvocationTargetException e) {
-					throw new EventListenerInvocationException("There was an exception inside the body of an @EventListener method. The delegate that failed to invoke was " + delegate + ".", e);
+					throw new EventListenerInvocationException(
+							"There was an exception inside the body of an @EventListener method. The delegate that failed to invoke was " + delegate + ".", e);
 				}
 			}
 		}
+
+		// Return the number of successful propagations
+		return successfulPropagations;
 	}
 
 	@Override

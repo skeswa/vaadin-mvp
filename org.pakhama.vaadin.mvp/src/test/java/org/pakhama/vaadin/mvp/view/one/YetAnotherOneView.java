@@ -1,6 +1,5 @@
 package org.pakhama.vaadin.mvp.view.one;
 
-import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 
 import com.vaadin.ui.Component;
@@ -27,15 +26,8 @@ public class YetAnotherOneView implements IOneView {
 	}
 
 	@Override
-	public void dispatch(IEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispatch(IEvent event, EventScope scope) {
-		// TODO Auto-generated method stub
-		
+	public int dispatch(IEvent event) {
+		return -1;
 	}
 
 }

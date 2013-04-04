@@ -32,21 +32,13 @@ public class View extends VerticalLayout implements IView {
 	}
 
 	@Override
-	public void dispatch(IEvent event) {
-		dispatch(event, EventScope.APPLICATION);
-	}
-
-	@Override
-	public void dispatch(IEvent event, EventScope scope) {
+	public int dispatch(IEvent event) {
 		if (event == null) {
 			throw new IllegalArgumentException("The event parameter was null.");
 		}
-		if (scope == null) {
-			throw new IllegalArgumentException("The scope parameter was null.");
-		}
-
+		
 		event.setSource(this);
-		this.eventBus.propagate(event, scope);
+		return this.eventBus.propagate(event, EventScope.PARENT);
 	}
 
 	public void onBind() {

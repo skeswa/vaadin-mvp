@@ -63,17 +63,19 @@ public class ViewFactory implements IViewFactory {
 		String lastSection = nameSections[nameSections.length - 1];
 
 		String namePermutation1 = null, namePermutation2 = null;
-		if (lastSection.charAt(0) == 'I') {
-			// IDummyView -> DummyView
-			namePermutation1 = lastSection.replace("I", "");
-			namePermutation1 = name.replace(lastSection, namePermutation1);
-			// IDummyView -> DummyViewImpl
-			namePermutation2 = lastSection.replace("I", "").concat("Impl");
-			namePermutation2 = name.replace(lastSection, namePermutation2);
-		} else {
-			// DummyView -> DummyViewImpl
-			namePermutation1 = lastSection.concat("Impl");
-			namePermutation1 = name.replace(lastSection, namePermutation1);
+		if (lastSection.length() >= 1) {
+			if (lastSection.charAt(0) == 'I') {
+				// IDummyView -> DummyView
+				namePermutation1 = lastSection.substring(1);
+				namePermutation1 = name.replace(lastSection, namePermutation1);
+				// IDummyView -> DummyViewImpl
+				namePermutation2 = lastSection.substring(1).concat("Impl");
+				namePermutation2 = name.replace(lastSection, namePermutation2);
+			} else {
+				// DummyView -> DummyViewImpl
+				namePermutation1 = lastSection.concat("Impl");
+				namePermutation1 = name.replace(lastSection, namePermutation1);
+			}
 		}
 
 		Class<?> viewImplClass = null;

@@ -1,6 +1,5 @@
 package org.pakhama.vaadin.mvp.view.four.view;
 
-import org.pakhama.vaadin.mvp.event.EventScope;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.view.four.IFourView;
 
@@ -28,15 +27,8 @@ public class FourView implements IFourView {
 	}
 
 	@Override
-	public void dispatch(IEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void dispatch(IEvent event, EventScope scope) {
-		// TODO Auto-generated method stub
-		
+	public int dispatch(IEvent event) {
+		return -1;
 	}
 
 }
