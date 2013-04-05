@@ -41,8 +41,16 @@ public abstract class MVPUI extends UI {
 		this.viewFactory = new ViewFactory(MVPUI.viewRegistry);
 		this.eventBus = new EventBus(this.eventHandlerRegistry, this.presenterRegistry);
 		this.presenterFactory = new PresenterFactory(this.eventBus, this.viewFactory, this.presenterRegistry);
-		// Register our event bus under the universal
+		// Register our event bus under the universal event bus
 		MVPUI.universalEventBus.register(this.eventBus);
+	}
+	
+	@Override
+	public void detach() {
+		super.detach();
+		// Unregister our event bus from the universal event bus
+		MVPUI.universalEventBus.unregister(this.eventBus);
+		// TODO Clear away session-specific registry contents here
 	}
 
 	protected <T extends IPresenter<? extends IView>> T createPresenter(Class<T> presenterClass) {
