@@ -56,29 +56,4 @@ public class View extends VerticalLayout implements IView {
 		return this;
 	}
 
-	@Override
-	public int hashCode() {
-		int result = 277 + getClass().getName().hashCode();
-		result = (31 * result);
-		if (eventBus != null) {
-			result += eventBus.hashCode();
-		}
-		result = (31 * result);
-		result += getComponentCount();
-		result = (31 * result);
-
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof View)) {
-			return false;
-		}
-
-		return obj.hashCode() == hashCode();
-	}
 }
