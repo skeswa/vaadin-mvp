@@ -5,6 +5,7 @@ import org.pakhama.vaadin.mvp.annotation.field.Factory;
 import org.pakhama.vaadin.mvp.event.IEvent;
 import org.pakhama.vaadin.mvp.event.IEventBus;
 import org.pakhama.vaadin.mvp.event.IEventHandler;
+import org.pakhama.vaadin.mvp.event.IEventHandlerRegistry;
 import org.pakhama.vaadin.mvp.event.IScopedEventDispatcher;
 import org.pakhama.vaadin.mvp.view.IView;
 
@@ -17,7 +18,9 @@ import org.pakhama.vaadin.mvp.view.IView;
  * parent-child structure. The result is a tree-like relationship structure,
  * which can be leveraged when dispatching events. For instance, presenters can
  * dispatch events to their parent, children or siblings. Implementations of the
- * {@link IPresenter} interface <i>must implement a default constructor</i>.<br>
+ * {@link IPresenter} interface <i>must implement a default constructor</i>.
+ * However, for initialization, the {@link IPresenter#onReady()} method should
+ * be implemented or overridden.<br>
  * 
  * </br>In custom implementations of {@link IPresenter} types, for the
  * {@link IPresenterFactory} to wire in the {@link IEventBus} and
@@ -69,15 +72,22 @@ public interface IPresenter<T extends IView> extends IEventHandler, IScopedEvent
 	/**
 	 * This method is invoked when this {@link IPresenter} is bound to a view.
 	 * Since presenters may be rebound to different views, this method is not
-	 * ideal for initialization. The default constructor should be used for the
-	 * aforementioned purpose. For custom {@link IPresenter} implementations,
-	 * maintaining a reference to the <code>view</code> parameter is a good
-	 * idea.
+	 * ideal for initialization. The {@link IPresenter#onReady()} method should
+	 * be used for general initialization.
 	 * 
 	 * @param view
 	 *            the view to which this presenter is being bound
 	 */
 	void onBind(T view);
+
+	/**
+	 * This method is invoked when this {@link IPresenter} has been registered
+	 * with the {@link IPresenterRegistry}, the {@link IEventHandlerRegistry}
+	 * and has been bound to its {@link IView}. This method is ideal for
+	 * initialization, as it is called exactly once by the
+	 * {@link IPresenterFactory} which created this presenter.
+	 */
+	void onReady();
 
 	/**
 	 * This method is invoked when this presenter is removed from its

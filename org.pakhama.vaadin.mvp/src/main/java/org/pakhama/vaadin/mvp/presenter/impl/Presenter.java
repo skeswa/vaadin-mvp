@@ -99,5 +99,11 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 			// Doesn't matter if finalize failed
 		}
 	}
-	
+
+	@Override
+	public void onReady() {
+		// This method is intended to be overridden
+		// by subclasses which want some sort of initialization
+	}
+
 }

@@ -98,6 +98,8 @@ public class PresenterFactory implements IPresenterFactory {
 		// Register the presenter-view pair to the proper registries
 		this.eventBus.getRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, null, viewInstance);
+		// This presenter is now ready
+		presenterInstance.onReady();
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}
