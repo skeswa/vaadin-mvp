@@ -1,4 +1,4 @@
-vaadin-mvp
-==========
+Model-View-Presenter for Vaadin
+===============================
 
-The Pakhama Labs Model-View-Presenter Implementation for Vaadin 7+ (Built on 7.0.2 to be specific.)
+A simple, extensible, reliable Model-View-Presenter Implementation for Vaadin 7+.
