@@ -41,7 +41,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 		// Register the handler in both of the delegate map fields
 		registerHandler(handler);
 		
-		logger.debug("Event Handler %s successfully added to the event handler registry.", handler);
+		logger.debug("Event Handler [{}] successfully added to the event handler registry.", handler);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 			this.handlerMap.remove(handler);
 		}
 		
-		logger.debug("Event Handler %s successfully removed from the event handler registry.", handler);
+		logger.debug("Event Handler [{}] successfully removed from the event handler registry.", handler);
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 				registerDelegate(this.unifiedHandlerMap, exclusionSet, newDelegate);
 				registerDelegate(ensureHandlerDelegateMap(handler), exclusionSet, newDelegate);
 				
-				logger.debug("Event Listener method %s successfully registered under event handler %s.", method, handler);
+				logger.debug("Event Listener method [{}] successfully registered under Event Handler [{}].", method.getName(), handler);
 			}
 		}
 	}

@@ -105,7 +105,7 @@ public class PresenterFactory implements IPresenterFactory {
 		// This presenter is now ready
 		presenterInstance.onReady();
 
-		logger.debug("New instance of Presenter Type %s successfully created.", presenterInstance.getClass());
+		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
 		
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
@@ -168,7 +168,7 @@ public class PresenterFactory implements IPresenterFactory {
 		this.eventBus.getRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
 		
-		logger.debug("New instance of Presenter Type %s successfully created.", presenterInstance.getClass());
+		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
 		
 		// Return the newly created presenter instance
 		return (T) presenterInstance;

@@ -26,7 +26,7 @@ public class Presenter<T extends IView> implements IPresenter<T> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(getClass().getSimpleName());
+		builder.append(getClass().getName());
 		builder.append(':');
 		builder.append('{');
 		if (view == null) {

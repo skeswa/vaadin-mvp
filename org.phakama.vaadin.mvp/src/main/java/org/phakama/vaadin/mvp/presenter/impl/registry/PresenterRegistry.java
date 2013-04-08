@@ -35,9 +35,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 		((IPresenter<IView>) presenter).onBind(view);
 		
 		if (parent == null) {
-			logger.debug("Presenter instance of type %s successfully added to the presenter registry with no parent.", presenter.getClass());
+			logger.debug("Presenter instance of type [{}] successfully added to the presenter registry with no parent.", presenter.getClass());
 		} else {
-			logger.debug("Presenter instance of type %s successfully added to the presenter registry under a parent of type %s.", presenter.getClass(), parent.getClass());
+			logger.debug("Presenter instance of type [{}] successfully added to the presenter registry under a parent of type [{}].", presenter.getClass(), parent.getClass());
 		}
 	}
 
@@ -55,7 +55,7 @@ public class PresenterRegistry implements IPresenterRegistry {
 		// Don't hold it a funeral
 		presenter.onUnbind();
 		
-		logger.debug("Presenter %s was successfully removed from the presenter registry.", presenter);
+		logger.debug("Presenter [{}] was successfully removed from the presenter registry.", presenter);
 	}
 
 	@Override
@@ -66,9 +66,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 		
 		IPresenter<? extends IView> owner = this.viewPresenterMap.get(view);
 		if (owner == null) {
-			logger.debug("Could not find the presenter that owns view %s.", view);
+			logger.info("Could not find the presenter that owns view [{}].", view);
 		} else {
-			logger.debug("Presenter %s was found to be the owner of view %s.", owner, view);
+			logger.info("Presenter [{}] was found to be the owner of view [{}].", owner, view);
 		}
 		
 		return owner;
@@ -82,9 +82,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		IPresenter<? extends IView> parent = this.presenterCache.parentOf(presenter);
 		if (parent == null) {
-			logger.debug("Could not find a parent of presenter %s.", presenter);
+			logger.info("Could not find a parent of presenter [{}].", presenter);
 		} else {
-			logger.debug("%s was found to be the parent of %s.", parent, presenter);
+			logger.info("[{}] was found to be the parent of [{}].", parent, presenter);
 		}
 		
 		return parent;
@@ -98,9 +98,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		Collection<IPresenter<? extends IView>> siblings = this.presenterCache.siblingsOf(presenter);
 		if (siblings == null) {
-			logger.debug("Could not find any siblings of presenter %s.", presenter);
+			logger.info("Could not find any siblings of presenter [{}].", presenter);
 		} else {
-			logger.debug("%d siblings of presenter %s were found.", siblings.size(), presenter);
+			logger.info("[{}] siblings of presenter [{}] were found.", siblings.size(), presenter);
 		}
 		
 		return siblings;
@@ -114,9 +114,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		Collection<IPresenter<? extends IView>> children = this.presenterCache.childrenOf(presenter);
 		if (children == null) {
-			logger.debug("Could not find any children of presenter %s.", presenter);
+			logger.info("Could not find any children of presenter [{}].", presenter);
 		} else {
-			logger.debug("%d children of presenter %s were found.", children.size(), presenter);
+			logger.info("[{}] children of presenter [{}] were found.", children.size(), presenter);
 		}
 		
 		return children;

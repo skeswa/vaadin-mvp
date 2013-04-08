@@ -50,7 +50,7 @@ public class ViewRegistry implements IViewRegistry {
 			viewImplList.add(viewImplClass);
 		}
 		
-		logger.debug("View Implementation Type %s implementing View Type successfully added to the view registry.", viewImplClass, viewType);
+		logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully added to the view registry.", viewImplClass, viewType);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class ViewRegistry implements IViewRegistry {
 			}
 		}
 		
-		logger.debug("View Implementation Type %s implementing View Type successfully removed from the view registry.", viewImplClass, viewType);
+		logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully removed from the view registry.", viewImplClass, viewType);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -103,7 +103,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 		this.viewCache.clear();
 		
-		logger.debug("The view registry was successfully emptied.");
+		logger.info("The view registry was successfully emptied.");
 	}
 
 	@Override
@@ -118,11 +118,11 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise, return the most recently added element
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null || viewImplList.size() == 0) {
-			logger.debug("A View Implementation Type could not be found for View Type %s.", viewClass);
+			logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
 			Class<? extends IView> viewImplClass = viewImplList.get(viewImplList.size() - 1);
-			logger.debug("View Implementation Type %s was found for View Type %s.", viewImplClass, viewClass);
+			logger.info("View Implementation Type [{}] was found for View Type [{}].", viewImplClass, viewClass);
 			return viewImplClass;
 		}
 	}
@@ -142,7 +142,7 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise, return the view of highest priority
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null || viewImplList.size() == 0) {
-			logger.debug("A View Implementation Type could not be found for View Type %s.", viewClass);
+			logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
 			// Loops through every view implementation, doing comparisons to
@@ -160,7 +160,7 @@ public class ViewRegistry implements IViewRegistry {
 				}
 			}
 			
-			logger.debug("The higest priority View Implementation Type %s was found for View Type %s.", highestPriorityViewImplClass, viewClass);
+			logger.info("The highest priority View Implementation Type [{}] was found for View Type [{}].", highestPriorityViewImplClass, viewClass);
 			
 			return highestPriorityViewImplClass;
 		}
@@ -178,10 +178,10 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise return a copy
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null) {
-			logger.debug("No View Implementation Types could not be found for View Type %s.", viewClass);
+			logger.info("No View Implementation Types could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
-			logger.debug("%d View Implementation Types were found for View Type %s.", viewImplList.size(), viewClass);
+			logger.info("[{}] View Implementation Types were found for View Type [{}].", viewImplList.size(), viewClass);
 			return new ArrayList<Class<? extends IView>>(viewImplList);
 		}
 	}

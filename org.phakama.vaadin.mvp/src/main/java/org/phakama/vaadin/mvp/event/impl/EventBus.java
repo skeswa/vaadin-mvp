@@ -51,6 +51,8 @@ public class EventBus implements IEventBus {
 		if (scope == null) {
 			throw new IllegalArgumentException("The registry parameter cannot be null.");
 		}
+		
+		logger.info("Attempting propagation of an event of type [{}] with scope [{}].", event.getClass(), scope);
 
 		// Keep track of successful propagations so we can return the count
 		int successfulPropagations = 0;
@@ -121,7 +123,7 @@ public class EventBus implements IEventBus {
 			for (IEventDelegate delegate : delegates) {
 				try {
 					delegate.invoke(event);
-					logger.debug("Event Type %s propagated to Event Handler of type %s.", event.getClass(), delegate.getHandler().getClass());
+					logger.debug("Event Type [{}] successfully propagated to Event Listener method [{}] within an Event Handler of type [{}].", event.getClass(), delegate.getMethod().getName(), delegate.getHandler().getClass());
 					// This will only increment if invocation succeeded
 					successfulPropagations++;
 				} catch (IllegalArgumentException e) {
@@ -135,7 +137,7 @@ public class EventBus implements IEventBus {
 				}
 			}
 		} else {
-			logger.debug("There were no event handlers listening for an event of type %s.", event.getClass());
+			logger.debug("There were no event handlers listening for an event of type [{}].", event.getClass());
 		}
 
 		// Return the number of successful propagations
@@ -149,13 +151,13 @@ public class EventBus implements IEventBus {
 
 	@Override
 	public void onBind(IUniversalEventBus universalEventBus) {
-		logger.debug("Event bus %s successfully bound to the universal event bus.", this);
+		logger.debug("Event bus [{}] successfully bound to the universal event bus.", this);
 		this.universalEventBus = universalEventBus;
 	}
 
 	@Override
 	public void onUnbind() {
-		logger.debug("Event bus %s successfully unbound from the universal event bus.", this);
+		logger.debug("Event bus [{}] successfully unbound from the universal event bus.", this);
 		this.universalEventBus = null;
 	}
 
