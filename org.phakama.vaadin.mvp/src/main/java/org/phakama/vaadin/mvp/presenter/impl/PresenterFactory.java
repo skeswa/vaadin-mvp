@@ -100,7 +100,7 @@ public class PresenterFactory implements IPresenterFactory {
 			// presenter factory field marked by @Factory
 		}
 		// Register the presenter-view pair to the proper registries
-		this.eventBus.getRegistry().register(presenterInstance);
+		this.eventBus.getEventHandlerRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, null, viewInstance);
 		// This presenter is now ready
 		presenterInstance.onReady();
@@ -165,7 +165,7 @@ public class PresenterFactory implements IPresenterFactory {
 			// presenter factory field marked by @Factory
 		}
 		// Register the presenter-view pair to the proper registries
-		this.eventBus.getRegistry().register(presenterInstance);
+		this.eventBus.getEventHandlerRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
 		
 		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());

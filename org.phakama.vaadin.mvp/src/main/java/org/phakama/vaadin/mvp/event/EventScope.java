@@ -1,24 +1,24 @@
 package org.phakama.vaadin.mvp.event;
 
+import org.phakama.vaadin.mvp.ui.MVPUI;
+
 /**
- * The
- * <code>EventScope<code> defines general event propagation restrictions for the event bus to adhere to in the <code>fire()</code>
- * method. All {@link IEvent}s specify an {@link EventScope} by definition. The
- * default {@link EventScope} is typically <code>EventScope.ALL</code>.
+ * The <code>EventScope</code> defines the event propagation restriction for the
+ * {@link IEventBus#propagate(IEvent, EventScope)} method.
  * 
  * @author Sandile
  */
 public enum EventScope {
 	/**
-	 * If the event source is a view, propagate the Event only to its presenter.
-	 * If the event source is a presenter, propagate the Event only to its
-	 * parent presenter. If the parent of the event source is null, the event
-	 * will not be propagated.
+	 * If the event source is a view, the event propagates only to its
+	 * presenter. If the event source is a presenter, the event propagates only
+	 * to its parent presenter. If the parent of the event source is null, the
+	 * event will not be propagated.
 	 */
 	PARENT,
 	/**
 	 * If the event source is a presenter and has a parent, then the event will
-	 * be propagated to only other children of the source's parent. If the
+	 * be propagated to only other children of the event source's parent. If the
 	 * parent of the event source is null, then the event will not be
 	 * propagated.
 	 */
@@ -29,14 +29,15 @@ public enum EventScope {
 	 */
 	CHILDREN,
 	/**
-	 * Propagate the event to all event listeners registered under this
-	 * session's event bus. This scope is the default for all events.
+	 * Propagate the event to all event listeners registered under the current
+	 * {@link MVPUI}'s event bus. This scope is very broad, and, therefore, is
+	 * mildly expensive.
 	 */
 	APPLICATION,
 	/**
 	 * Propagate the event to all event listeners registered in <b><i>every
-	 * session's event bus.</i></b> This scope should be employed with care,
-	 * since propagating an event of this scope is very expensive.
+	 * {@link MVPUI}'s event bus.</i></b> This scope should be employed with
+	 * care, since propagating an event of this scope can be very expensive.
 	 */
 	UNIVERSAL
 }

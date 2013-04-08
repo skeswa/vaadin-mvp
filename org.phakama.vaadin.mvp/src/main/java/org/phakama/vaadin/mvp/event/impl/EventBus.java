@@ -145,8 +145,13 @@ public class EventBus implements IEventBus {
 	}
 
 	@Override
-	public IEventHandlerRegistry getRegistry() {
+	public IEventHandlerRegistry getEventHandlerRegistry() {
 		return this.delegateRegistry;
+	}
+	
+	@Override
+	public IPresenterRegistry getPresenterRegistry() {
+		return this.presenterRegistry;
 	}
 
 	@Override
