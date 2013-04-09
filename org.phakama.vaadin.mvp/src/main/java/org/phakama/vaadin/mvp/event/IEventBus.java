@@ -41,8 +41,7 @@ public interface IEventBus extends Serializable {
 	 *            the event to propagate
 	 * @param scope
 	 *            the restriction for event propagation
-	 * @return the number of {@link EventListener} methods successfully
-	 *         propagated to
+	 * @return the number of {@link EventListener} methods successfully invoked
 	 */
 	int propagate(IEvent event, EventScope scope);
 

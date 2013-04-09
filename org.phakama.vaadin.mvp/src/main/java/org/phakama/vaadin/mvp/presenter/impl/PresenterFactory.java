@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class PresenterFactory implements IPresenterFactory {
 	private static final long serialVersionUID = 2864312773902372753L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(PresenterFactory.class);
 
 	private IEventBus eventBus;
@@ -106,7 +106,7 @@ public class PresenterFactory implements IPresenterFactory {
 		presenterInstance.onReady();
 
 		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
-		
+
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}
@@ -167,9 +167,11 @@ public class PresenterFactory implements IPresenterFactory {
 		// Register the presenter-view pair to the proper registries
 		this.eventBus.getEventHandlerRegistry().register(presenterInstance);
 		this.presenterRegistry.register(presenterInstance, parent, viewInstance);
-		
+		// This presenter is now ready
+		presenterInstance.onReady();
+
 		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
-		
+
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
 	}
