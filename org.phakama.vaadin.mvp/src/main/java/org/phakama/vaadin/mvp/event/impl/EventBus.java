@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
 
 public class EventBus implements IEventBus {
 	private static final long serialVersionUID = -5989527350073214759L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(EventBus.class);
+
+	private boolean logging = false;
 
 	private IEventHandlerRegistry delegateRegistry;
 	private IPresenterRegistry presenterRegistry;
@@ -51,8 +53,9 @@ public class EventBus implements IEventBus {
 		if (scope == null) {
 			throw new IllegalArgumentException("The registry parameter cannot be null.");
 		}
-		
-		logger.info("Attempting propagation of an event of type [{}] with scope [{}].", event.getClass(), scope);
+
+		if (this.logging)
+			logger.info("Attempting propagation of an event of type [{}] with scope [{}].", event.getClass(), scope);
 
 		// Keep track of successful propagations so we can return the count
 		int successfulPropagations = 0;
@@ -111,7 +114,8 @@ public class EventBus implements IEventBus {
 			delegates = this.delegateRegistry.find(event.getClass());
 			break;
 		case UNIVERSAL:
-			// Keep in mind, EventScope.UNIVERSAL just means EventScope.APPLICATION for every other
+			// Keep in mind, EventScope.UNIVERSAL just means
+			// EventScope.APPLICATION for every other
 			// bus - we have to do our own EventScope.APPLICATION propagation
 			delegates = this.delegateRegistry.find(event.getClass());
 			if (this.universalEventBus != null) {
@@ -123,7 +127,9 @@ public class EventBus implements IEventBus {
 			for (IEventDelegate delegate : delegates) {
 				try {
 					delegate.invoke(event);
-					logger.debug("Event Type [{}] successfully propagated to Event Listener method [{}] within an Event Handler of type [{}].", event.getClass(), delegate.getMethod().getName(), delegate.getHandler().getClass());
+					if (this.logging)
+						logger.debug("Event Type [{}] successfully propagated to Event Listener method [{}] within an Event Handler of type [{}].", event.getClass(),
+								delegate.getMethod().getName(), delegate.getHandler().getClass());
 					// This will only increment if invocation succeeded
 					successfulPropagations++;
 				} catch (IllegalArgumentException e) {
@@ -137,7 +143,8 @@ public class EventBus implements IEventBus {
 				}
 			}
 		} else {
-			logger.debug("There were no event handlers listening for an event of type [{}].", event.getClass());
+			if (this.logging)
+				logger.debug("There were no event handlers listening for an event of type [{}].", event.getClass());
 		}
 
 		// Return the number of successful propagations
@@ -148,7 +155,7 @@ public class EventBus implements IEventBus {
 	public IEventHandlerRegistry getEventHandlerRegistry() {
 		return this.delegateRegistry;
 	}
-	
+
 	@Override
 	public IPresenterRegistry getPresenterRegistry() {
 		return this.presenterRegistry;
@@ -156,14 +163,31 @@ public class EventBus implements IEventBus {
 
 	@Override
 	public void onBind(IUniversalEventBus universalEventBus) {
-		logger.debug("Event bus [{}] successfully bound to the universal event bus.", this);
+		if (this.logging)
+			logger.debug("Event bus [{}] successfully bound to the universal event bus.", this);
 		this.universalEventBus = universalEventBus;
 	}
 
 	@Override
 	public void onUnbind() {
-		logger.debug("Event bus [{}] successfully unbound from the universal event bus.", this);
+		if (this.logging)
+			logger.debug("Event bus [{}] successfully unbound from the universal event bus.", this);
 		this.universalEventBus = null;
+	}
+
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
 	}
 
 }

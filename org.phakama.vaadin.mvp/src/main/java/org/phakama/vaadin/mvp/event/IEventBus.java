@@ -1,7 +1,6 @@
 package org.phakama.vaadin.mvp.event;
 
-import java.io.Serializable;
-
+import org.phakama.vaadin.mvp.ILogger;
 import org.phakama.vaadin.mvp.annotation.event.EventListener;
 import org.phakama.vaadin.mvp.presenter.IPresenter;
 import org.phakama.vaadin.mvp.presenter.IPresenterRegistry;
@@ -25,7 +24,7 @@ import org.phakama.vaadin.mvp.ui.MVPUI;
  * @author Sandile
  * 
  */
-public interface IEventBus extends Serializable {
+public interface IEventBus extends ILogger {
 	/**
 	 * This method is the bread-and-butter of publish-subscribe-style
 	 * communication. The <code>event</code> parameter is used to invoke

@@ -1,9 +1,10 @@
 package org.phakama.vaadin.mvp.event;
 
-import java.io.Serializable;
 import java.util.Collection;
 
-public interface IEventHandlerRegistry extends Serializable {
+import org.phakama.vaadin.mvp.ILogger;
+
+public interface IEventHandlerRegistry extends ILogger {
 	void register(IEventHandler handler);
 	void unregister(IEventHandler handler);
 	void clear();

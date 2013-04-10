@@ -1,7 +1,8 @@
 package org.phakama.vaadin.mvp.view;
 
-import java.io.Serializable;
 import java.util.Collection;
+
+import org.phakama.vaadin.mvp.ILogger;
 
 /**
  * The {@link IViewRegistry} is responsible for keeping track of implementations
@@ -11,7 +12,7 @@ import java.util.Collection;
  * @author Sandile
  * 
  */
-public interface IViewRegistry extends Serializable {
+public interface IViewRegistry extends ILogger {
 	/**
 	 * Registers the class of an implementation of a view extending the
 	 * {@link IView} interface. The {@link IView} this view instance type is

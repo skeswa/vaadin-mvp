@@ -1,8 +1,8 @@
 package org.phakama.vaadin.mvp.presenter;
 
-import java.io.Serializable;
 import java.util.Collection;
 
+import org.phakama.vaadin.mvp.ILogger;
 import org.phakama.vaadin.mvp.view.IView;
 
 /**
@@ -16,7 +16,7 @@ import org.phakama.vaadin.mvp.view.IView;
  * @author Sandile
  * 
  */
-public interface IPresenterRegistry extends Serializable {
+public interface IPresenterRegistry extends ILogger {
 	/**
 	 * Adds a presenter to the registry, and indicates the presenter's parent
 	 * initially.

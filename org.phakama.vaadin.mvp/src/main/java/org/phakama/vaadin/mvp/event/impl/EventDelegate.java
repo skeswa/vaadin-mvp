@@ -180,4 +180,9 @@ public class EventDelegate implements IEventDelegate {
 			}
 		}
 	}
+
+	@Override
+	public boolean allowsForeign() {
+		return allowForeign;
+	}
 }

@@ -1,20 +1,26 @@
 package org.phakama.vaadin.mvp.view.impl;
 
-import org.phakama.vaadin.mvp.view.IPopupView;
+import org.phakama.vaadin.mvp.view.IFloatingView;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-public class PopupView extends View implements IPopupView {
+public class FloatingView extends View implements IFloatingView {
 	private static final long serialVersionUID = -1236153430779028557L;
+	
+	public static final String DEFAULT_WIDTH = "300px";
+	public static final String DEFAULT_HEIGHT = "200px";
 	
 	private Window window = new Window();
 	private boolean visible = false;
 	
-	public PopupView() {
+	public FloatingView() {
 		super();
 		this.window.setContent(this);
+		this.window.setHeight(DEFAULT_HEIGHT);
+		this.window.setWidth(DEFAULT_WIDTH);
+		
 		setSizeFull();
 	}
 	
@@ -70,7 +76,7 @@ public class PopupView extends View implements IPopupView {
 	
 	@Override
 	public Component getComponent() {
-		throw new UnsupportedOperationException("The getComponent() method is not supported by PopupView. Please use PopupView.show() and PopupView.hide()"); 
+		throw new UnsupportedOperationException("The getComponent() method is not supported by FloatingView. Please use FloatingView.show() and FloatingView.hide()"); 
 	}
 	
 	@Override

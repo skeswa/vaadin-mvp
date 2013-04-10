@@ -1,7 +1,6 @@
 package org.phakama.vaadin.mvp.view;
 
-import java.io.Serializable;
-
+import org.phakama.vaadin.mvp.ILogger;
 import org.phakama.vaadin.mvp.exception.ViewConstructionException;
 
 /**
@@ -15,7 +14,7 @@ import org.phakama.vaadin.mvp.exception.ViewConstructionException;
  * @author Sandile
  * 
  */
-public interface IViewFactory extends Serializable {
+public interface IViewFactory extends ILogger {
 	/**
 	 * Creates and returns an instance of a view implementing the provided
 	 * <code>viewClass</code> view type. The <code>viewClass</code> parameter

@@ -11,11 +11,13 @@ import org.slf4j.LoggerFactory;
 
 public class PresenterRegistry implements IPresenterRegistry {
 	private static final long serialVersionUID = 3399515352322336940L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(PresenterRegistry.class);
 
 	private PresenterRegistryTree presenterCache = new PresenterRegistryTree();
 	private HashMap<IView, IPresenter<? extends IView>> viewPresenterMap = new HashMap<IView, IPresenter<? extends IView>>();
+
+	private boolean logging = false;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -33,11 +35,14 @@ public class PresenterRegistry implements IPresenterRegistry {
 		// Welcome the new presenter with open arms, then whisper into its ear
 		// that its days are numbered >:-D
 		((IPresenter<IView>) presenter).onBind(view);
-		
+
 		if (parent == null) {
-			logger.debug("Presenter instance of type [{}] successfully added to the presenter registry with no parent.", presenter.getClass());
+			if (this.logging)
+				logger.debug("Presenter instance of type [{}] successfully added to the presenter registry with no parent.", presenter.getClass());
 		} else {
-			logger.debug("Presenter instance of type [{}] successfully added to the presenter registry under a parent of type [{}].", presenter.getClass(), parent.getClass());
+			if (this.logging)
+				logger.debug("Presenter instance of type [{}] successfully added to the presenter registry under a parent of type [{}].", presenter.getClass(),
+						parent.getClass());
 		}
 	}
 
@@ -54,8 +59,9 @@ public class PresenterRegistry implements IPresenterRegistry {
 		// Let the presenter in on its own death,
 		// Don't hold it a funeral
 		presenter.onUnbind();
-		
-		logger.debug("Presenter [{}] was successfully removed from the presenter registry.", presenter);
+
+		if (this.logging)
+			logger.debug("Presenter [{}] was successfully removed from the presenter registry.", presenter);
 	}
 
 	@Override
@@ -63,14 +69,16 @@ public class PresenterRegistry implements IPresenterRegistry {
 		if (view == null) {
 			throw new IllegalArgumentException("The view parameter was null.");
 		}
-		
+
 		IPresenter<? extends IView> owner = this.viewPresenterMap.get(view);
 		if (owner == null) {
-			logger.info("Could not find the presenter that owns view [{}].", view);
+			if (this.logging)
+				logger.info("Could not find the presenter that owns view [{}].", view);
 		} else {
-			logger.info("Presenter [{}] was found to be the owner of view [{}].", owner, view);
+			if (this.logging)
+				logger.info("Presenter [{}] was found to be the owner of view [{}].", owner, view);
 		}
-		
+
 		return owner;
 	}
 
@@ -82,11 +90,13 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		IPresenter<? extends IView> parent = this.presenterCache.parentOf(presenter);
 		if (parent == null) {
-			logger.info("Could not find a parent of presenter [{}].", presenter);
+			if (this.logging)
+				logger.info("Could not find a parent of presenter [{}].", presenter);
 		} else {
-			logger.info("[{}] was found to be the parent of [{}].", parent, presenter);
+			if (this.logging)
+				logger.info("[{}] was found to be the parent of [{}].", parent, presenter);
 		}
-		
+
 		return parent;
 	}
 
@@ -98,11 +108,13 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		Collection<IPresenter<? extends IView>> siblings = this.presenterCache.siblingsOf(presenter);
 		if (siblings == null) {
-			logger.info("Could not find any siblings of presenter [{}].", presenter);
+			if (this.logging)
+				logger.info("Could not find any siblings of presenter [{}].", presenter);
 		} else {
-			logger.info("[{}] siblings of presenter [{}] were found.", siblings.size(), presenter);
+			if (this.logging)
+				logger.info("[{}] siblings of presenter [{}] were found.", siblings.size(), presenter);
 		}
-		
+
 		return siblings;
 	}
 
@@ -114,11 +126,13 @@ public class PresenterRegistry implements IPresenterRegistry {
 
 		Collection<IPresenter<? extends IView>> children = this.presenterCache.childrenOf(presenter);
 		if (children == null) {
-			logger.info("Could not find any children of presenter [{}].", presenter);
+			if (this.logging)
+				logger.info("Could not find any children of presenter [{}].", presenter);
 		} else {
-			logger.info("[{}] children of presenter [{}] were found.", children.size(), presenter);
+			if (this.logging)
+				logger.info("[{}] children of presenter [{}] were found.", children.size(), presenter);
 		}
-		
+
 		return children;
 	}
 
@@ -127,4 +141,18 @@ public class PresenterRegistry implements IPresenterRegistry {
 		return this.viewPresenterMap.entrySet().size();
 	}
 
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
+	}
 }

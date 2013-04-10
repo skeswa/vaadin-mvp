@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public class ViewRegistry implements IViewRegistry {
 	private static final long serialVersionUID = -3658969717696659192L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ViewRegistry.class);
+
+	private boolean logging = false;
 
 	private ConcurrentHashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>> viewCache = new ConcurrentHashMap<Class<? extends IView>, ArrayList<Class<? extends IView>>>();
 
@@ -49,8 +51,9 @@ public class ViewRegistry implements IViewRegistry {
 		if (!viewImplList.contains(viewImplClass)) {
 			viewImplList.add(viewImplClass);
 		}
-		
-		logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully added to the view registry.", viewImplClass, viewType);
+
+		if (this.logging)
+			logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully added to the view registry.", viewImplClass, viewType);
 	}
 
 	@Override
@@ -76,8 +79,9 @@ public class ViewRegistry implements IViewRegistry {
 				this.viewCache.remove(viewType);
 			}
 		}
-		
-		logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully removed from the view registry.", viewImplClass, viewType);
+
+		if (this.logging)
+			logger.debug("View Implementation Type [{}] implementing View Type [{}] successfully removed from the view registry.", viewImplClass, viewType);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,8 +106,9 @@ public class ViewRegistry implements IViewRegistry {
 			}
 		}
 		this.viewCache.clear();
-		
-		logger.info("The view registry was successfully emptied.");
+
+		if (this.logging)
+			logger.info("The view registry was successfully emptied.");
 	}
 
 	@Override
@@ -118,11 +123,13 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise, return the most recently added element
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null || viewImplList.size() == 0) {
-			logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
+			if (this.logging)
+				logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
 			Class<? extends IView> viewImplClass = viewImplList.get(viewImplList.size() - 1);
-			logger.info("View Implementation Type [{}] was found for View Type [{}].", viewImplClass, viewClass);
+			if (this.logging)
+				logger.info("View Implementation Type [{}] was found for View Type [{}].", viewImplClass, viewClass);
 			return viewImplClass;
 		}
 	}
@@ -142,7 +149,8 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise, return the view of highest priority
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null || viewImplList.size() == 0) {
-			logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
+			if (this.logging)
+				logger.info("A View Implementation Type could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
 			// Loops through every view implementation, doing comparisons to
@@ -159,9 +167,10 @@ public class ViewRegistry implements IViewRegistry {
 					}
 				}
 			}
-			
-			logger.info("The highest priority View Implementation Type [{}] was found for View Type [{}].", highestPriorityViewImplClass, viewClass);
-			
+
+			if (this.logging)
+				logger.info("The highest priority View Implementation Type [{}] was found for View Type [{}].", highestPriorityViewImplClass, viewClass);
+
 			return highestPriorityViewImplClass;
 		}
 	}
@@ -178,10 +187,12 @@ public class ViewRegistry implements IViewRegistry {
 		// otherwise return a copy
 		ArrayList<Class<? extends IView>> viewImplList = this.viewCache.get(viewClass);
 		if (viewImplList == null) {
-			logger.info("No View Implementation Types could not be found for View Type [{}].", viewClass);
+			if (this.logging)
+				logger.info("No View Implementation Types could not be found for View Type [{}].", viewClass);
 			return null;
 		} else {
-			logger.info("[{}] View Implementation Types were found for View Type [{}].", viewImplList.size(), viewClass);
+			if (this.logging)
+				logger.info("[{}] View Implementation Types were found for View Type [{}].", viewImplList.size(), viewClass);
 			return new ArrayList<Class<? extends IView>>(viewImplList);
 		}
 	}
@@ -191,4 +202,18 @@ public class ViewRegistry implements IViewRegistry {
 		return this.viewCache.size();
 	}
 
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
+	}
 }

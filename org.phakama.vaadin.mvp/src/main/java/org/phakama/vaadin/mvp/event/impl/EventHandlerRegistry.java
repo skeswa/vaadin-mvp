@@ -17,9 +17,13 @@ import org.slf4j.LoggerFactory;
 
 public class EventHandlerRegistry implements IEventHandlerRegistry {
 	private static final long serialVersionUID = -6658219565978880435L;
-	
+	// TODO: totally redo this to not handler polymorphism at the registration
+	// level - handle it at the invocation level
+
 	private static final Logger logger = LoggerFactory.getLogger(EventHandlerRegistry.class);
-	
+
+	private boolean logging = false;
+
 	/**
 	 * This map is the union of every entry in the the
 	 * {@link EventHandlerRegistry#handlerMap}. This is specifically useful for
@@ -40,8 +44,9 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 		}
 		// Register the handler in both of the delegate map fields
 		registerHandler(handler);
-		
-		logger.debug("Event Handler [{}] successfully added to the event handler registry.", handler);
+
+		if (this.logging)
+			logger.debug("Event Handler [{}] successfully added to the event handler registry.", handler);
 	}
 
 	@Override
@@ -70,14 +75,21 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 			}
 			this.handlerMap.remove(handler);
 		}
-		
-		logger.debug("Event Handler [{}] successfully removed from the event handler registry.", handler);
+
+		if (this.logging)
+			logger.debug("Event Handler [{}] successfully removed from the event handler registry.", handler);
 	}
 
 	@Override
 	public void clear() {
+		for (IEventHandler key : this.handlerMap.keySet()) {
+			unregister(key);
+		}
+		this.handlerMap.clear();
 		this.unifiedHandlerMap.clear();
-		logger.debug("Event handler registry was successfully emptied.");
+
+		if (this.logging)
+			logger.debug("Event handler registry was successfully emptied.");
 	}
 
 	@Override
@@ -86,7 +98,16 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 			throw new IllegalArgumentException("The eventClass parameter cannot be null.");
 		}
 
-		return this.unifiedHandlerMap.get(eventClass);
+		ArrayList<IEventDelegate> allDelegates = new ArrayList<IEventDelegate>();
+		HashSet<IEventDelegate> delegateSet = null;
+		for (Class<?> currentEventType = eventClass; currentEventType != null; currentEventType = findClosestRegisteredSuperType(currentEventType)) {
+			delegateSet = this.unifiedHandlerMap.get(currentEventType);
+			if (delegateSet != null) {
+				allDelegates.addAll(delegateSet);
+			}
+		}
+
+		return allDelegates;
 	}
 
 	@Override
@@ -97,6 +118,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 		if (handlers == null) {
 			throw new IllegalArgumentException("The handlers parameter cannot be null.");
 		}
+
 		// Get the delegates for each handler, and throw them into a list of all
 		// the delegates
 		ArrayList<IEventDelegate> allDelegates = new ArrayList<IEventDelegate>();
@@ -104,14 +126,18 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 		HashSet<IEventDelegate> delegates = null;
 		for (IEventHandler handler : handlers) {
 			if (handler != null) {
-				delegateMap = this.handlerMap.get(handler);
-				if (delegateMap != null) {
-					delegates = delegateMap.get(eventClass);
-					if (delegates != null) {
-						// We don't call contains() here because we know that
-						// delegates will never repeat - they are guaranteed to
-						// have different event handlers
-						allDelegates.addAll(delegates);
+				for (Class<?> currentEventType = eventClass; currentEventType != null; currentEventType = findClosestRegisteredSuperType(currentEventType)) {
+					delegateMap = this.handlerMap.get(handler);
+					if (delegateMap != null) {
+						delegates = delegateMap.get(currentEventType);
+						if (delegates != null) {
+							// We don't call contains() here because we know
+							// that
+							// delegates will never repeat - they are guaranteed
+							// to
+							// have different event handlers
+							allDelegates.addAll(delegates);
+						}
 					}
 				}
 			}
@@ -136,8 +162,9 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 				EventDelegate newDelegate = new EventDelegate(method, handler, eventType, listenerAnnotation.allowForeign());
 				registerDelegate(this.unifiedHandlerMap, exclusionSet, newDelegate);
 				registerDelegate(ensureHandlerDelegateMap(handler), exclusionSet, newDelegate);
-				
-				logger.debug("Event Listener method [{}] successfully registered under Event Handler [{}].", method.getName(), handler);
+
+				if (this.logging)
+					logger.debug("Event Listener method [{}] successfully registered under Event Handler [{}].", method.getName(), handler);
 			}
 		}
 	}
@@ -184,12 +211,11 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 		return delegateMap;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Class<? extends IEvent> findClosestRegisteredSuperType(Class<? extends IEvent> eventType) {
+	private Class<?> findClosestRegisteredSuperType(Class<?> eventType) {
 		Class<?> target = eventType.getSuperclass();
 		while (IEvent.class.isAssignableFrom(target)) {
 			if (this.unifiedHandlerMap.containsKey(target)) {
-				return (Class<? extends IEvent>) target;
+				return target;
 			} else {
 				target = target.getSuperclass();
 			}
@@ -200,24 +226,7 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 	private void registerDelegate(HashMap<Class<? extends IEvent>, HashSet<IEventDelegate>> map, HashSet<Class<? extends IEvent>> exclusionSet, EventDelegate delegate) {
 		HashSet<IEventDelegate> delegateSet = map.get(delegate.getEventType());
 		if (delegateSet == null) {
-			// This delegate bucket doesn't yet exist, so we have to find the
-			// closest super bucket and steal all its delegates
 			delegateSet = new HashSet<IEventDelegate>();
-			Class<? extends IEvent> closestRegisteredSuperType = findClosestRegisteredSuperType(delegate.getEventType());
-			if (closestRegisteredSuperType != null) {
-				// Add the contents of the super delegate set if it exists
-				HashSet<IEventDelegate> superDelegateSet = map.get(closestRegisteredSuperType);
-				if (superDelegateSet != null) {
-					for (IEventDelegate superDelegate : superDelegateSet) {
-						if (superDelegate != null) {
-							delegateSet.add(superDelegate);
-							if (superDelegate instanceof EventDelegate) {
-								((EventDelegate) superDelegate).addOwner(delegateSet);
-							}
-						}
-					}
-				}
-			}
 			// Add this new delegate to the new delegate set
 			delegateSet.add(delegate);
 			delegate.addOwner(delegateSet);
@@ -230,30 +239,25 @@ public class EventHandlerRegistry implements IEventHandlerRegistry {
 				delegate.addOwner(delegateSet);
 			}
 		}
-
-		// Now we have to update all the sub delegate sets, while keeping
-		// exclusions in mind
-		for (Class<? extends IEvent> key : map.keySet()) {
-			if (key != null) {
-				// If this key is a sub type of the new event type, and is not
-				// being excluded, add the new delegate to it
-				if (!exclusionSet.contains(key)) {
-					if (delegate.getEventType().isAssignableFrom(key) && !delegate.getEventType().equals(key)) {
-						HashSet<IEventDelegate> subDelegateSet = map.get(key);
-						if (subDelegateSet != null) {
-							if (!subDelegateSet.contains(delegate)) {
-								subDelegateSet.add(delegate);
-								delegate.addOwner(subDelegateSet);
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	@Override
 	public int size() {
 		return this.handlerMap.keySet().size();
+	}
+
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
 	}
 }

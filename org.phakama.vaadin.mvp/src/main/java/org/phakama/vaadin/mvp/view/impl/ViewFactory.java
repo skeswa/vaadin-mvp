@@ -12,7 +12,9 @@ public class ViewFactory implements IViewFactory {
 	private static final long serialVersionUID = 7902009139894230033L;
 
 	private static final Logger logger = LoggerFactory.getLogger(ViewFactory.class);
-	
+
+	private boolean logging = false;
+
 	private IViewRegistry registry;
 
 	public ViewFactory(IViewRegistry registry) {
@@ -57,8 +59,9 @@ public class ViewFactory implements IViewFactory {
 			throw new InaccessibleViewException(e);
 		}
 
-		logger.debug("New instance of View Implementation Type [{}] implementing View Type [{}] successfully instantiated.", viewImplClass, viewClass);
-		
+		if (this.logging)
+			logger.debug("New instance of View Implementation Type [{}] implementing View Type [{}] successfully instantiated.", viewImplClass, viewClass);
+
 		return (T) viewInstance;
 	}
 
@@ -67,8 +70,9 @@ public class ViewFactory implements IViewFactory {
 		String name = viewClass.getName().trim();
 		String[] nameSections = name.split("\\.");
 		String lastSection = nameSections[nameSections.length - 1];
-		
-		logger.info("Looking for a View Implementation of View Type [{}].", viewClass);
+
+		if (this.logging)
+			logger.info("Looking for a View Implementation of View Type [{}].", viewClass);
 
 		String namePermutation1 = null, namePermutation2 = null;
 		if (lastSection.length() >= 1) {
@@ -88,18 +92,24 @@ public class ViewFactory implements IViewFactory {
 
 		Class<?> viewImplClass = null;
 		try {
-			logger.debug("Checking if View Implementation Type with name [{}] exists...", namePermutation1);
+			if (this.logging)
+				logger.debug("Checking if View Implementation Type with name [{}] exists...", namePermutation1);
 			viewImplClass = Class.forName(namePermutation1);
-			logger.info("View Implementation Type with name [{}] exists!", namePermutation1);
+			if (this.logging)
+				logger.info("View Implementation Type with name [{}] exists!", namePermutation1);
 		} catch (ClassNotFoundException e) {
-			logger.info("Couldn't find View Implementation Type with name [{}].", namePermutation1);
+			if (this.logging)
+				logger.info("Couldn't find View Implementation Type with name [{}].", namePermutation1);
 			if (namePermutation2 != null) {
 				try {
-					logger.debug("Checking if View Implementation Type with name [{}] exists...", namePermutation2);
+					if (this.logging)
+						logger.debug("Checking if View Implementation Type with name [{}] exists...", namePermutation2);
 					viewImplClass = Class.forName(namePermutation2);
-					logger.info("View Implementation Type with name [{}] exists!", namePermutation2);
+					if (this.logging)
+						logger.info("View Implementation Type with name [{}] exists!", namePermutation2);
 				} catch (ClassNotFoundException e1) {
-					logger.info("Couldn't find View Implementation Type with name [{}].", namePermutation2);
+					if (this.logging)
+						logger.info("Couldn't find View Implementation Type with name [{}].", namePermutation2);
 				}
 			}
 		}
@@ -120,4 +130,18 @@ public class ViewFactory implements IViewFactory {
 		return this.registry;
 	}
 
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
+	}
 }

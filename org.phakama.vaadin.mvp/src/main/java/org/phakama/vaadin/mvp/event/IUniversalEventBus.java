@@ -1,7 +1,6 @@
 package org.phakama.vaadin.mvp.event;
 
-import java.io.Serializable;
-
+import org.phakama.vaadin.mvp.ILogger;
 import org.phakama.vaadin.mvp.annotation.event.EventListener;
 
 /**
@@ -13,7 +12,7 @@ import org.phakama.vaadin.mvp.annotation.event.EventListener;
  * @author Sandile
  * 
  */
-public interface IUniversalEventBus extends Serializable {
+public interface IUniversalEventBus extends ILogger {
 	/**
 	 * Similar to {@link IEventBus#propagate(IEvent, EventScope)}. Propagates
 	 * the provided <code>event</code> to every registered {@link IEventBus}

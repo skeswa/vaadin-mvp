@@ -1,6 +1,6 @@
 package org.phakama.vaadin.mvp.view;
 
-public interface IPopupView extends IView {
+public interface IFloatingView extends IView {
 	void show();
 	void hide();
 }

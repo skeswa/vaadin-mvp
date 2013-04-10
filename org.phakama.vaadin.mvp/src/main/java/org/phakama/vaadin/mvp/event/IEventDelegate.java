@@ -8,6 +8,7 @@ public interface IEventDelegate extends Serializable {
 	Method getMethod();
 	Class<? extends IEvent> getEventType();
 	IEventHandler getHandler();
+	boolean allowsForeign();
 	
 	void suicide();
 	void invoke(IEvent event) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException;

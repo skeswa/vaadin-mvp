@@ -24,6 +24,8 @@ public class PresenterFactory implements IPresenterFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(PresenterFactory.class);
 
+	private boolean logging = false;
+
 	private IEventBus eventBus;
 	private IViewFactory viewFactory;
 	private IPresenterRegistry presenterRegistry;
@@ -105,7 +107,8 @@ public class PresenterFactory implements IPresenterFactory {
 		// This presenter is now ready
 		presenterInstance.onReady();
 
-		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
+		if (this.logging)
+			logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
 
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
@@ -170,7 +173,8 @@ public class PresenterFactory implements IPresenterFactory {
 		// This presenter is now ready
 		presenterInstance.onReady();
 
-		logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
+		if (this.logging)
+			logger.debug("New instance of Presenter Type [{}] successfully created.", presenterInstance.getClass());
 
 		// Return the newly created presenter instance
 		return (T) presenterInstance;
@@ -216,4 +220,18 @@ public class PresenterFactory implements IPresenterFactory {
 		return (Class<?>) ((ParameterizedType) type.getGenericSuperclass()).getActualTypeArguments()[0];
 	}
 
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
+	}
 }

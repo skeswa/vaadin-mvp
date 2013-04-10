@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public class UniversalEventBus implements IUniversalEventBus {
 	private static final long serialVersionUID = 6236360073352874831L;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(UniversalEventBus.class);
+
+	private boolean logging = false;
 
 	private ArrayList<SoftReference<IEventBus>> eventBusList = new ArrayList<SoftReference<IEventBus>>();
 
@@ -26,8 +28,9 @@ public class UniversalEventBus implements IUniversalEventBus {
 		if (origin == null) {
 			throw new IllegalArgumentException("The origin parameter cannot be null.");
 		}
-		
-		logger.info("Attempting propagation of an event of type [{}].", event.getClass());
+
+		if (this.logging)
+			logger.info("Attempting propagation of an event of type [{}].", event.getClass());
 
 		// Keep track of successful propagations so we can return the count
 		int successfulPropagations = 0;
@@ -36,7 +39,8 @@ public class UniversalEventBus implements IUniversalEventBus {
 			ArrayList<SoftReference<IEventBus>> killList = null;
 			IEventBus eventBus = null;
 
-			logger.info("[{}] Event Busses are available for propagation.", this.eventBusList.size());
+			if (this.logging)
+				logger.info("[{}] Event Busses are available for propagation.", this.eventBusList.size());
 			for (SoftReference<IEventBus> eventBusRef : this.eventBusList) {
 				if (eventBusRef != null) {
 					eventBus = eventBusRef.get();
@@ -53,13 +57,15 @@ public class UniversalEventBus implements IUniversalEventBus {
 						if (!eventBus.equals(origin)) {
 							// Make sure everyone knows that the event came from
 							// another guy
-							logger.info("Attempting to duplicate event [{}] for foreign propagation.", event);
+							if (this.logging)
+								logger.info("Attempting to duplicate event [{}] for foreign propagation.", event);
 							event = event.duplicate();
 							// Make a copy of the event for the other busses so
 							// we can markForeign() without worrying
 							event.markForeign();
 							eventBus.propagate(event, EventScope.APPLICATION);
-							logger.debug("Event [{}] successfully propagated to Event Bus [{}].", event, eventBus);
+							if (this.logging)
+								logger.debug("Event [{}] successfully propagated to Event Bus [{}].", event, eventBus);
 							// This will only increment if invocation succeeded
 							successfulPropagations++;
 						}
@@ -68,13 +74,14 @@ public class UniversalEventBus implements IUniversalEventBus {
 			}
 			// Ok, lets kill all the dead busses
 			if (killList != null) {
-				logger.debug("[{}] Event Bus references died.", killList.size());
+				if (this.logging)
+					logger.debug("[{}] Event Bus references died.", killList.size());
 				for (SoftReference<IEventBus> deadEventBusRef : killList) {
 					this.eventBusList.remove(deadEventBusRef);
 				}
 			}
 		}
-		
+
 		// Return the number of successful propagations
 		return successfulPropagations;
 	}
@@ -118,6 +125,21 @@ public class UniversalEventBus implements IUniversalEventBus {
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isLogging() {
+		return this.logging;
+	}
+
+	@Override
+	public void enableLogging() {
+		this.logging = true;
+	}
+
+	@Override
+	public void disableLogging() {
+		this.logging = false;
 	}
 
 }
